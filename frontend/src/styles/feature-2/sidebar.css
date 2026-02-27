@@ -1,0 +1,85 @@
+.f2-side {
+  width: 86px;
+}
+.f2-sideInner {
+  height: calc(100vh - 36px);
+  border-radius: 28px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 10px;
+  gap: 14px;
+}
+
+.f2-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.f2-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  margin-top: 6px;
+}
+
+.f2-navBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: 180ms ease;
+  position: relative;
+}
+
+.f2-navBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+}
+.f2-navBtn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.f2-activeDot {
+  position: absolute;
+  right: 8px;
+  top: 10px;
+  width: 8px;
+  height: 8px;
+  background: #a3e635;
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(163, 230, 53, 0.9);
+}
+
+.f2-profile {
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.f2-navBtn.locked {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.f2-lock {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.65;
+}

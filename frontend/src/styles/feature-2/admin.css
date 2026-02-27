@@ -1,0 +1,90 @@
+.admin-wrap {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-header h2 {
+  margin: 0;
+}
+
+.admin-header select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.admin-msg {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff3cd;
+  border: 1px solid #ffe69c;
+}
+
+.admin-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-name {
+  font-weight: 800;
+}
+.admin-email {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+}
+.admin-status {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-approve,
+.btn-reject {
+  border: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-approve {
+  background: #a7c957;
+  color: white;
+}
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}

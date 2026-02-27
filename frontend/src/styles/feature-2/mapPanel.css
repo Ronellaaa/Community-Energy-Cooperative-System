@@ -1,0 +1,115 @@
+.f2-mapWrap {
+  padding: 16px;
+  height: 520px;
+  position: relative;
+  overflow: hidden;
+}
+.f2-mapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.f2-mapTitle {
+  font-size: 14px;
+  font-weight: 800;
+}
+.f2-mapSub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+.f2-fakeMap {
+  margin-top: 14px;
+  height: 320px;
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(163, 230, 53, 0.18),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 70% 50%,
+      rgba(56, 189, 248, 0.15),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.02)
+    );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.f2-gridLines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.f2-pin {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #ff4d4d;
+  border-radius: 50%;
+  left: 62%;
+  top: 44%;
+  box-shadow: 0 0 0 10px rgba(255, 77, 77, 0.12);
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.f2-floatRow {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.f2-floatCard {
+  flex: 1;
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: popIn 420ms ease both;
+}
+
+.f2-floatCard.dark {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.f2-floatSmall {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+.f2-floatBig {
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+.f2-floatMeta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 8px;
+}

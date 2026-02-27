@@ -1,0 +1,49 @@
+.f2-topbar {
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.f2-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+.f2-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+.f2-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.f2-btnPrimary {
+  background: #a3e635;
+  border: none;
+  color: #0b0f14;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+.f2-btnPrimary:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.f2-btnGhost {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 10px 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+.f2-btnGhost:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
