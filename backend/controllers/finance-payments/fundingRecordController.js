@@ -92,7 +92,15 @@ export const updateFundingRecord = async (req, res) => {
 
     if (amount !== undefined) {
       const amt = Number(amount);
-      if (!Number.isFinite(amt) || amt <= 0) updateRecord.amount = amt;
+      if (!Number.isFinite(amt) || amt <= 0) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Amount must be a positive number",
+          });
+      }
+      updateRecord.amount = amt;
     }
     if (status !== undefined) updateRecord.status = status;
     if (date !== undefined) updateRecord.date = new Date(date);

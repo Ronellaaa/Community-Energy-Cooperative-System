@@ -1,16 +1,43 @@
+import express from "express";
 import {
   createMaintenanceExpense,
   getProjectMaintenanceExpenses,
   updateMaintenanceExpense,
   deleteMaintenanceExpense,
 } from "../../controllers/finance-payments/maintenanceExpenseController.js";
-import express from "express";
+
+import { protect } from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", createMaintenanceExpense);
-router.get("/:projectId", getProjectMaintenanceExpenses);
-router.put("/:id", updateMaintenanceExpense);
-router.delete("/:id", deleteMaintenanceExpense);
+// Create expense
+router.post(
+  "/",
+  protect,
+  authorize("admin", "officer"),
+  createMaintenanceExpense,
+);
+
+// List expenses by project
+router.get(
+  "/project/:projectId",
+  protect,
+  authorize("admin", "officer"),
+  getProjectMaintenanceExpenses,
+);
+
+// Update / delete expense by expense id
+router.put(
+  "/:id",
+  protect,
+  authorize("admin", "officer"),
+  updateMaintenanceExpense,
+);
+router.delete(
+  "/:id",
+  protect,
+  authorize("admin", "officer"),
+  deleteMaintenanceExpense,
+);
 
 export default router;

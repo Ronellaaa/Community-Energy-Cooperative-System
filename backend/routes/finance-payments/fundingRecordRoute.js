@@ -1,16 +1,33 @@
+import express from "express";
 import {
   createFundingRecord,
-  getprojectFundingSummary,
   updateFundingRecord,
-  deleteFundingRecord
+  deleteFundingRecord,
+  getprojectFundingSummary,
 } from "../../controllers/finance-payments/fundingRecordController.js";
-import express from "express";
+
+import { protect } from "../../middleware/authMiddleware.js"; // adjust path/name
 
 const router = express.Router();
 
-router.post("/", createFundingRecord);
-router.get("/summary/:projectId", getprojectFundingSummary);
-router.put("/:id", updateFundingRecord);
-router.delete("/:id", deleteFundingRecord);
+// Create record
+router.post("/", protect, authorize("admin", "officer"), createFundingRecord);
+
+// Summary by project
+router.get(
+  "/summary/:projectId",
+  protect,
+  authorize("admin", "officer", "member"),
+  getprojectFundingSummary,
+);
+
+// Update / Delete record by record id
+router.put("/:id", protect, authorize("admin", "officer"), updateFundingRecord);
+router.delete(
+  "/:id",
+  protect,
+  authorize("admin", "officer"),
+  deleteFundingRecord,
+);
 
 export default router;
