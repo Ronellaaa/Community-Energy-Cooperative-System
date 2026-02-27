@@ -41,7 +41,7 @@ export const getProjectMaintenanceExpenses = async (req, res) => {
     }
 
     const getMaintenanceExpenses =
-      await FundService.getProjectMaintenanceExpenses(projectId);
+      await FundService.getProjectFundingSummary(projectId);
     return res
       .status(200)
       .json({ success: true, data: getMaintenanceExpenses });

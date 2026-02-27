@@ -5,38 +5,37 @@ import {
   updateMaintenanceExpense,
   deleteMaintenanceExpense,
 } from "../../controllers/finance-payments/maintenanceExpenseController.js";
-import { protect } from "../../middleware/authMiddleware.js";
-import { authorize } from "../../middleware/roleMiddleware.js";
+import { requireAuth, requireOfficer, requireAdmin } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 // Create expense
 router.post(
   "/",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   createMaintenanceExpense,
 );
 
 // List expenses by project
 router.get(
   "/project/:projectId",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   getProjectMaintenanceExpenses,
 );
 
 // Update / delete expense by expense id
 router.put(
   "/:id",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   updateMaintenanceExpense,
 );
 router.delete(
   "/:id",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   deleteMaintenanceExpense,
 );
 

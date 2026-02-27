@@ -57,7 +57,7 @@ export const getProjectMemberPayments = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid Project ID" });
     }
-    const payments = await FundService.getProjectMemberPayments(projectId);
+    const payments = await FundService.getProjectFundingSummary(projectId);
     return res.status(200).json({ success: true, data: payments });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

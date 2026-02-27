@@ -5,20 +5,17 @@ import {
   updateFundingSource,
   deleteFundingSource,
 } from "../../controllers/finance-payments/fundingSourceController.js";
-
-import { protect } from "../../middleware/authMiddleware.js";
-import { authorize } from "../../middleware/roleMiddleware.js";
-
+import { requireAuth, requireOfficer } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/", protect, authorize("admin", "officer"), createFundingSource);
-router.get("/", protect, authorize("admin", "officer"), listFundingSources);
-router.put("/:id", authorize("admin", "officer"), protect, updateFundingSource);
+router.post("/", requireAuth, requireOfficer, createFundingSource);
+router.get("/", requireAuth, requireOfficer, listFundingSources);
+router.put("/:id", requireAuth, requireOfficer, updateFundingSource);
 router.delete(
   "/:id",
-  authorize("admin", "officer"),
-  protect,
+  requireAuth,
+  requireOfficer,
   deleteFundingSource,
 );
 

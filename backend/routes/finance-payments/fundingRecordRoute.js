@@ -6,29 +6,26 @@ import {
   getprojectFundingSummary,
 } from "../../controllers/finance-payments/fundingRecordController.js";
 
-import { protect } from "../../middleware/authMiddleware.js";
-import { authorize } from "../../middleware/roleMiddleware.js";
-
+import { requireAuth, requireOfficer, requireAdmin } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 // Create record
-router.post("/", protect, authorize("admin", "officer"), createFundingRecord);
+router.post("/", requireAuth, requireOfficer, createFundingRecord);
 
 // Summary by project
 router.get(
   "/summary/:projectId",
-  protect,
-  authorize("admin", "officer", "member"),
+  requireAuth,
   getprojectFundingSummary,
 );
 
 // Update / Delete record by record id
-router.put("/:id", protect, authorize("admin", "officer"), updateFundingRecord);
+router.put("/:id", requireAuth, requireOfficer, updateFundingRecord);
 router.delete(
   "/:id",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   deleteFundingRecord,
 );
 

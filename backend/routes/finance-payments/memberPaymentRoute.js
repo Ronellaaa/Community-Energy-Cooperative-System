@@ -5,28 +5,26 @@ import {
   updateMemberPayment,
   deleteMemberPayment,
 } from "../../controllers/finance-payments/memberPaymentController.js";
-import { protect } from "../../middleware/authMiddleware.js";
-import { authorize } from "../../middleware/roleMiddleware.js";
-
+import { requireAuth, requireOfficer, requireAdmin } from "../../middleware/auth.js";
 const router = express.Router();
 
 // Create payment
-router.post("/", protect, authorize("admin", "officer"), createMemberPayment);
+router.post("/", requireAuth, requireOfficer, createMemberPayment);
 
 // List payments by project
 router.get(
   "/project/:projectId",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   getProjectMemberPayments,
 );
 
 // Update / delete payment by payment id
-router.put("/:id", protect, authorize("admin", "officer"), updateMemberPayment);
+router.put("/:id", requireAuth, requireOfficer, updateMemberPayment);
 router.delete(
   "/:id",
-  protect,
-  authorize("admin", "officer"),
+  requireAuth,
+  requireOfficer,
   deleteMemberPayment,
 );
 
