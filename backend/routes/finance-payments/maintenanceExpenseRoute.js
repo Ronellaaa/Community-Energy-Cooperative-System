@@ -5,8 +5,8 @@ import {
   updateMaintenanceExpense,
   deleteMaintenanceExpense,
 } from "../../controllers/finance-payments/maintenanceExpenseController.js";
-
 import { protect } from "../../middleware/authMiddleware.js";
+import { authorize } from "../../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
