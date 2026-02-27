@@ -5,7 +5,14 @@ const CreditSchema = new mongoose.Schema({
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "User", 
-    required: true 
+    required: false  // Not required because some credits may be linked to funding sources instead 
+  },
+
+    // Funding source that owns this credit (new field)
+  fundingSourceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "FundingSource",
+    required: false
   },
   
   // Project that generated this credit
@@ -107,6 +114,16 @@ const CreditSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  }
+});
+
+// Add validation to ensure either userId OR fundingSourceId is present
+CreditSchema.pre('validate', async function() {
+  if (!this.userId && !this.fundingSourceId) {
+    throw new Error('Either userId or fundingSourceId must be provided');
+  }
+  if (this.userId && this.fundingSourceId) {
+    throw new Error('Cannot have both userId and fundingSourceId - choose one');
   }
 });
 

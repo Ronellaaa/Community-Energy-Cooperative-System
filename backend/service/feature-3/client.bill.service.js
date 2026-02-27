@@ -71,11 +71,8 @@ export const getBillById = async (id) => {
 
 // UPDATE BILL SERVICE (CALLED FROM CONTROLLER)
 export const updateBill = async (id, updateData, file) => {
-  // Find existing bill
-  const existingBill = await Bill.findOne({
-    _id: id,
-    userId: TEST_USER_ID
-  });
+  // Find existing bill by ID first to avoid false 404s for older records
+  const existingBill = await Bill.findById(id);
   
   if (!existingBill) {
     const error = new Error('Bill not found');
@@ -87,7 +84,7 @@ export const updateBill = async (id, updateData, file) => {
   if (file) {
     // Delete old image from Cloudinary if exists
     if (existingBill.billImage && existingBill.billImage.publicId) {
-      await cloudinary.uploader.destroy(existingBill.billImage.publicId);
+      await deleteFromCloudinary(existingBill.billImage.publicId);
     }
     
     // Upload new image using existing uploadService

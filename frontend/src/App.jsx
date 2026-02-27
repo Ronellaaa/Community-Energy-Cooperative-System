@@ -35,6 +35,7 @@ export default function App() {
         <Route path="/join-community" element={<JoinCommunity />} />
         <Route path="/officer/dashboard" element={<OfficerDashboard />} />
         <Route path="/admin/officers" element={<AdminOfficers />} />
+        
         <Route
           path="/add-bill"
           element={

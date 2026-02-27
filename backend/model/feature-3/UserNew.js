@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0,
     required: false  // Making it optional so existing docs don't break
-  },                                                                                                              createdAt: {
+  },                                                                                                createdAt: {
     type: Date,
     default: Date.now
   },

@@ -21,7 +21,15 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     isArchived: { type: Boolean, default: false },
+
+    walletBalance: {
+    type: Number,
+    default: 0,
+    min: 0,
+    required: false  // Making it optional so existing docs don't break
   },
+  },
+  
   { timestamps: true },
 );
 

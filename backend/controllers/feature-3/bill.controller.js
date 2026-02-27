@@ -3,11 +3,18 @@ import { createBill as createBillService, getBills as getBillsService, getBillBy
 
 import fs from 'fs';
 
+const getUploadedFile = (req) => {
+  if (req.file) return req.file;
+  if (!req.files) return null;
+  return req.files.billImage?.[0] || req.files.image?.[0] || req.files.file?.[0] || null;
+};
+
 // CREATE BILL - POST (CALLED FROM ROUTES)
 export const createBill = async (req, res) => {
   try {
+    const uploadedFile = getUploadedFile(req);
     const billData = JSON.parse(req.body.billData);
-    const bill = await createBillService(billData, req.file);
+    const bill = await createBillService(billData, uploadedFile);
     
     res.status(201).json({
       success: true,
@@ -31,8 +38,9 @@ export const createBill = async (req, res) => {
     console.error('Error creating bill:', error);
     
     // Clean up uploaded file if there's an error
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    const uploadedFile = getUploadedFile(req);
+    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+      fs.unlinkSync(uploadedFile.path);
     }
     
     res.status(400).json({
@@ -98,10 +106,11 @@ export const getBillById = async (req, res) => {
 // UPDATE BILL FULLY - PUT (CALLED FROM ROUTES)
 export const updateBill = async (req, res) => {
   try {
+    const uploadedFile = getUploadedFile(req);
     let updateData = req.body.billData ? JSON.parse(req.body.billData) : req.body;
     
     // Call service to update bill
-    const bill = await updateBillService(req.params.id, updateData, req.file);
+    const bill = await updateBillService(req.params.id, updateData, uploadedFile);
     
     res.json({
       success: true,
@@ -112,8 +121,9 @@ export const updateBill = async (req, res) => {
     console.error('Error updating bill:', error);
     
     // Clean up uploaded file if there's an error
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
+    const uploadedFile = getUploadedFile(req);
+    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+      fs.unlinkSync(uploadedFile.path);
     }
     
     res.status(400).json({

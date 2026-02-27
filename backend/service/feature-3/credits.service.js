@@ -1,6 +1,6 @@
 import Investment from "../../model/feature-3/Investment.js"; 
 import Credit from "../../model/feature-3/Credit.js";
-import User from "../../model/feature-3/UserNew.js";
+import User from "../../model/User.js";
 import MemberPayment from "../../model/finance-payments/memberPaymentModel.js";
 import FundingRecord from "../../model/finance-payments/fundingRecordModel.js";
 import FundingSource from "../../model/finance-payments/fundingSourceModel.js";
@@ -140,7 +140,7 @@ export default async function distributeCredits(projectId, billingPeriod) {
       // ✅ FIXED: Use originalAmount and remainingAmount (no creditAmount)
       // ✅ FIXED: Fixed typo "coriginalAmount" → "originalAmount"
       const credit = await Credit.create({
-        userId: source.source.user,
+        fundingSourceId: source.source._id,
         projectId: projectObjectId,
         billingPeriod,
         settlementId: settlementObjectId,
@@ -151,7 +151,7 @@ export default async function distributeCredits(projectId, billingPeriod) {
       creditRecords.push(credit);
 
       // Add to user's wallet
-      await User.findByIdAndUpdate(source.source.user, { $inc: { walletBalance: creditAmount } });
+     // await User.findByIdAndUpdate(source.source.user, { $inc: { walletBalance: creditAmount } });
       
       console.log(`   → ${source.source.fundName}: ${creditAmount} credits`);
     }

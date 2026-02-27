@@ -15,7 +15,11 @@ const router = express.Router();
 const TEST_USER_ID = new mongoose.Types.ObjectId("642f20000000000000000001");
 
 // CREATE BILL - POST(BY THE CLIENT)
-router.post('/', upload.single('billImage'), createBill);
+router.post('/', upload.fields([
+  { name: 'billImage', maxCount: 1 },
+  { name: 'image', maxCount: 1 },
+  { name: 'file', maxCount: 1 }
+]), createBill);
 
 // GET ALL BILLS WITH FILTERING SUPPORT (BY THE CLIENT)
 router.get('/', getBills);
@@ -24,7 +28,11 @@ router.get('/', getBills);
 router.get('/:id', getBillById);
 
 // UPDATE BILL FULLY - PUT (BY THE CLIENT)
-router.put('/:id', upload.single('billImage'), updateBill);
+router.put('/:id', upload.fields([
+  { name: 'billImage', maxCount: 1 },
+  { name: 'image', maxCount: 1 },
+  { name: 'file', maxCount: 1 }
+]), updateBill);
 
 // DELETE PENDING BILL - DELETE (BY THE CLIENT)
 router.delete('/:id', deleteBill); 
