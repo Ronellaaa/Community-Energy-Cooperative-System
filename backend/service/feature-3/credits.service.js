@@ -1,9 +1,9 @@
 import Investment from "../../model/feature-3/Investment.js"; 
 import Credit from "../../model/feature-3/Credit.js";
 import User from "../../model/feature-3/UserNew.js";
-import MemberPayment from "../../model/feature-3/MemberPayment.js";
-import FundingRecord from "../../model/feature-3/FundingRecord.js";
-import FundingSource from "../../model/feature-3/FundingSource.js";
+import MemberPayment from "../../model/finance-payments/memberPaymentModel.js";
+import FundingRecord from "../../model/finance-payments/fundingRecordModel.js";
+import FundingSource from "../../model/finance-payments/fundingSourceModel.js";
 import EnergySettlement from "../../model/feature-3/EnergySettlement.js";
 import mongoose from "mongoose";
 

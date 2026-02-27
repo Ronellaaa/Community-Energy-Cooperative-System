@@ -1,7 +1,7 @@
 import FundingRecord from "../../model/finance-payments/fundingRecordModel.js";
 import MemberPayment from "../../model/finance-payments/memberPaymentModel.js";
 import MaintenanceExpense from "../../model/finance-payments/maintenanceExpenseModel.js";
-import Project from "../../model/finance-payments/projectModel.js";
+import Project from "../../model/feature-1/Project.js";
 import mongoose from "mongoose";
 
 const FinanceService = {
@@ -17,7 +17,7 @@ const FinanceService = {
 
       if (!project) throw new Error("Project not found");
 
-      const projectCost = Number(project.estimatedCost || 0);
+      const projectCost = Number(Project.totalFunding || 0);
 
       const fundingAggregation = await FundingRecord.aggregate([
         { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
