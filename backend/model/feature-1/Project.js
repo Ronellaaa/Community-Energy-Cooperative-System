@@ -23,8 +23,8 @@ const projectSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["Draft", "Approved", "Active"],
-    default: "Draft"
+    enum: ["Pending", "Approved", "Active"],
+    default: "Pending"
   }
 
 }, { timestamps: true });

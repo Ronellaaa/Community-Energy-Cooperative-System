@@ -29,7 +29,7 @@ export const deleteProject = async (req, res) => {
     const project = await projectService.deleteProject(req.params.id);
     res.json({ message: "Deleted successfully", project });
   } catch (error) {
-    res.status(400).json({ message: error.message }); // ✅ fixed 500 error
+    res.status(400).json({ message: error.message }); 
   }
 };
 
@@ -38,7 +38,7 @@ export const approve = async (req, res) => {
     const project = await projectService.approveProject(req.params.id);
     res.json(project);
   } catch (error) {
-    res.status(400).json({ message: error.message }); // ✅ fixed 500 error
+    res.status(400).json({ message: error.message }); 
   }
 };
 
@@ -47,6 +47,6 @@ export const activate = async (req, res) => {
     const project = await projectService.activateProject(req.params.id);
     res.json(project);
   } catch (error) {
-    res.status(400).json({ message: error.message }); // ✅ fixed 500 error
+    res.status(400).json({ message: error.message }); 
   }
 };

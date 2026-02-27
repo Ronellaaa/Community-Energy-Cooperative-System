@@ -10,21 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@mui/icons-material": "^7.3.8",
+    "@mui/material": "^7.3.8",
     "axios": "^1.13.5",
     "framer-motion": "^12.34.3",
+    "lucide-react": "^0.575.0",
+    "multer": "^2.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.13.1",
-    "tailwindcss": "^4.2.0",
-    "lucide-react": "^0.575.0",
-    "multer": "^2.0.2",
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.8",
-    "@mui/material": "^7.3.8"
+    "tailwindcss": "^4.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

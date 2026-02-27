@@ -86,12 +86,12 @@ export default function ProjectDetailPage() {
   const membersCount      = project.assignedMembers?.length || 0;
   const fundingPct        = project.cost > 0 ? Math.min(100, Math.round((project.totalFunding / project.cost) * 100)) : 0;
   const fundingSufficient = project.totalFunding >= project.cost;
-  const canApprove        = project.status === "Draft" && project.cost > 0 && membersCount >= 2;
+  const canApprove        = project.status === "Pending" && project.cost > 0 && membersCount >= 5;
   const canActivate       = project.status === "Approved" && fundingSufficient;
 
   const approvalBlocks = [
     ...(!project.cost || project.cost <= 0  ? ["Project cost not defined"] : []),
-    ...(membersCount < 2 ? [`Min 2 members required (currently ${membersCount})`] : []),
+    ...(membersCount < 5 ? [`Min 5 members required (currently ${membersCount})`] : []),
   ];
   const activationBlocks = [
     ...(project.status !== "Approved" ? ["Project must be Approved first"] : []),

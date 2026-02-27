@@ -20,7 +20,7 @@ import "./App.css";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    
       <Routes>
         {/* Redirect root */}
         // <Route path="/" element={<Navigate to="/projects" replace />} />
@@ -67,6 +67,6 @@ export default function App() {
           }
         />
       </Routes>
-    </BrowserRouter>
+    
   );
 }

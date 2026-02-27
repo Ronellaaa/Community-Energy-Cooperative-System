@@ -131,7 +131,7 @@ const handleDelete = async () => {
 
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 4, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 10, padding: 4, width: "fit-content", marginBottom: 22 }}>
-        {["All", "Draft", "Approved", "Active"].map(f => (
+        {["All", "Pending", "Approved", "Active"].map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: "7px 18px", borderRadius: 7, fontSize: 13, cursor: "pointer", fontWeight: 500,
             border: filter === f ? "1px solid rgba(0,229,160,0.25)" : "1px solid transparent",
