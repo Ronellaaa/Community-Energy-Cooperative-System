@@ -49,21 +49,21 @@ export default async function distributeCredits(projectId, billingPeriod) {
   console.log(`📋 Found ${members.length} unique members for project`);
 
   // ============================================
-  // GET FUNDING SOURCES (exclude LOANS)
+  // GET FUNDING SOURCES 
   // ============================================
   const fundingRecords = await FundingRecord.find({
     projectId: projectObjectId,
     status: "RECEIVED"
   }).populate("sourceId");
   
-  // Filter to exclude LOAN type funding sources
-  const nonLoanRecords = fundingRecords.filter(record => 
-    record.sourceId && record.sourceId.fundType !== "LOAN"
+  // All funding sources (including loans) will get credits
+  const allFundingRecords  = fundingRecords.filter(record => 
+    record.sourceId
   );
   
   // Group by funding source and sum amounts
   const sourceMap = new Map();
-  nonLoanRecords.forEach(record => {
+  allFundingRecords .forEach(record => {
     const sourceId = record.sourceId._id.toString();
     if (sourceMap.has(sourceId)) {
       sourceMap.get(sourceId).totalAmount += record.amount;
@@ -76,10 +76,10 @@ export default async function distributeCredits(projectId, billingPeriod) {
   });
   
   const fundingSources = Array.from(sourceMap.values());
-  const totalNonLoanFunding = fundingSources.reduce((sum, f) => sum + f.totalAmount, 0);
+  const totalFunding  = fundingSources.reduce((sum, f) => sum + f.totalAmount, 0);
   
-  console.log(`💰 Found ${fundingSources.length} non-LOAN funding sources`);
-  console.log(`💰 Total non-LOAN funding: ${totalNonLoanFunding}`);
+  console.log(`💰 Found ${fundingSources.length} funding sources`);
+  console.log(`💰 Total funding: ${totalFunding }`);
 
   // Safety check: totalCredits ≥ 0
   const totalCredits = Math.max(settlement.totalCredits, 0);
@@ -132,8 +132,8 @@ export default async function distributeCredits(projectId, billingPeriod) {
     for (const source of fundingSources) {
       // Calculate proportional share
       let creditAmount = 0;
-      if (totalNonLoanFunding > 0) {
-        const sourceShare = source.totalAmount / totalNonLoanFunding;
+      if (totalFunding  > 0) {
+        const sourceShare = source.totalAmount / totalFunding;
         creditAmount = Math.round(sourceShare * investorPool);
       }
 
@@ -150,8 +150,15 @@ export default async function distributeCredits(projectId, billingPeriod) {
       });
       creditRecords.push(credit);
 
-      // Add to user's wallet
-     // await User.findByIdAndUpdate(source.source.user, { $inc: { walletBalance: creditAmount } });
+      // ✅ UPDATED: Update funding source's creditsReceived
+      await FundingSource.findByIdAndUpdate(
+        source.source._id, 
+        { 
+          $inc: { 
+            creditsReceived: creditAmount  // Only increment creditsReceived
+          } 
+        }
+      );
       
       console.log(`   → ${source.source.fundName}: ${creditAmount} credits`);
     }

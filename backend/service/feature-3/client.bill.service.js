@@ -1,10 +1,11 @@
 // services/billService.js
 import Bill from '../../model/feature-3/Bill.js';
+import Credit from '../../model/feature-3/Credit.js';
 import mongoose from 'mongoose';
 import { uploadToCloudinary, deleteFromCloudinary  } from './handleImgService.js';
 import { calculateTotals } from '../../utils/feature-3/client.bill.utils.js';
 
-const TEST_USER_ID = new mongoose.Types.ObjectId("642f20000000000000000001");
+const TEST_USER_ID = new mongoose.Types.ObjectId("444444444444444444444443");
 
 // CREATE BILL SERVICE (CALLED FROM CONTROLLER)
 export const createBill = async (billData, file) => {
@@ -79,6 +80,13 @@ export const updateBill = async (id, updateData, file) => {
     error.status = 404;
     throw error;
   }
+
+   // CHECK IF BILL STATUS IS PENDING
+  if (existingBill.status !== 'pending') {
+    const error = new Error('Bill can only be updated when status is pending');
+    error.status = 400;
+    throw error;
+  }
   
   // Handle new image upload
   if (file) {
@@ -133,4 +141,41 @@ export const deleteBill = async (id) => {
   await bill.deleteOne();
   
   return { message: 'Bill deleted successfully' };
+};
+
+export const getUserBillSummaryService = async () => {
+  const bills = await Bill.find({ userId: TEST_USER_ID });
+  
+  // Get credit summary with remaining amount
+  const credits = await Credit.find({ userId: TEST_USER_ID });
+  const totalOriginalCredits = credits.reduce((sum, c) => sum + (c.originalAmount || c.creditAmount || 0), 0);
+  const totalRemainingCredits = credits.reduce((sum, c) => sum + (c.remainingAmount || 0), 0);
+  const totalUsedCredits = totalOriginalCredits - totalRemainingCredits;
+  
+  return {
+    userId: TEST_USER_ID,
+    bills: {
+      total: bills.length,
+      pending: bills.filter(b => b.status === 'pending').length,
+      approved: bills.filter(b => b.status === 'approved').length,
+      rejected: bills.filter(b => b.status === 'rejected').length
+    },
+    financials: {
+      totalOriginalAmount: bills.reduce((sum, b) => sum + (b.totalAmountDue || 0), 0),
+      totalReducedAmount: bills
+        .filter(b => b.status === 'approved')
+        .reduce((sum, b) => sum + (b.reducedAmount || 0), 0),
+      totalSaved: bills
+        .filter(b => b.status === 'approved')
+        .reduce((sum, b) => sum + ((b.totalAmountDue - b.reducedAmount) || 0), 0)
+    },
+    credits: {
+      totalOriginal: totalOriginalCredits,
+      totalRemaining: totalRemainingCredits,
+      totalUsed: totalUsedCredits,
+      count: credits.length,
+      fullyUsedCount: credits.filter(c => c.remainingAmount === 0).length,
+      partiallyUsedCount: credits.filter(c => c.remainingAmount > 0 && c.remainingAmount < (c.originalAmount || c.creditAmount)).length
+    }
+  };
 };
