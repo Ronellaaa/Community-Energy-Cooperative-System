@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../api";
+import Navbar from "../../components/Navbar";
 
 export default function AdminOfficers() {
   const token = localStorage.getItem("token");
@@ -71,6 +72,7 @@ export default function AdminOfficers() {
 
   return (
     <div className="od-page">
+      <Navbar />
       <div className="od-top">
         <div className="od-top-inner">
           <div>
@@ -271,6 +273,15 @@ function OfficerCard({ officer, token, onChanged }) {
           <>
             <div>
               <b>Phone:</b> {officer.phone || "—"}
+            </div>
+            <div>
+              <b>Community:</b> {officer.communityId?.name || "Not assigned yet"}
+            </div>
+            <div>
+              <b>Location:</b> {officer.communityId?.location || "—"}
+            </div>
+            <div className="od-community-id">
+              <b>Community ID:</b> {officer.communityId?._id || "No community"}
             </div>
             <div className="od-foot">
               <span className="od-time">

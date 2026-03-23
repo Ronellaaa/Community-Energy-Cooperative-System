@@ -10,6 +10,7 @@ import {
   listCommunitiesAdmin,
   archiveOfficer,
   unarchiveOfficer,
+  listUsers,
 } from "../../controllers/feature-2/adminController.js";
 
 const router = express.Router();
@@ -46,4 +47,5 @@ router.patch(
   requireAdmin,
   unarchiveOfficer,
 );
+router.get("/users", requireAuth, requireAdmin, listUsers);
 export default router;

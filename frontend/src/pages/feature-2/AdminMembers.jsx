@@ -1,79 +1,81 @@
 import { useEffect, useState } from "react";
-import { api, setAuthToken } from "../../api";
+import { apiRequest } from "../../api";
+import Navbar from "../../components/Navbar";
 import "../../styles/feature-2/admin.css";
 
 export default function AdminMembers() {
-  const [status, setStatus] = useState("pending");
-  const [memberships, setMemberships] = useState([]);
+  const token = localStorage.getItem("token");
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setAuthToken(token);
-  }, []);
-
-  const load = async () => {
-    setMsg("");
-    try {
-      const res = await api.get(`/memberships?status=${status}`);
-      setMemberships(res.data.memberships || []);
-    } catch (e) {
-      setMsg(e?.response?.data?.message || "Failed to load");
-    }
-  };
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem("user") || "{}");
+  } catch {}
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line
-  }, [status]);
+    const load = async () => {
+      setLoading(true);
+      setMsg("");
+      try {
+        const list = await apiRequest("/api/admin/users", { token });
+        setMembers(Array.isArray(list) ? list : []);
+      } catch (e) {
+        setMsg(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const approve = async (userId) => {
-    await api.patch(`/memberships/${userId}/approve`);
     load();
-  };
+  }, [token]);
 
-  const reject = async (userId) => {
-    await api.patch(`/memberships/${userId}/reject`);
-    load();
-  };
+  if (user.role !== "ADMIN") {
+    return (
+      <div className="admin-wrap">
+        <div className="admin-msg">Forbidden (Admin only)</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="admin-wrap">
-      <div className="admin-header">
-        <h2>Membership Requests</h2>
+    <div>
+      <Navbar />
+      <div className="admin-wrap">
+        <div className="admin-header">
+          <h2>Users</h2>
+        </div>
 
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
-      </div>
+        {msg ? <div className="admin-msg">{msg}</div> : null}
 
-      {msg ? <div className="admin-msg">{msg}</div> : null}
+        <div className="admin-list">
+          {loading ? <p>Loading users...</p> : null}
 
-      <div className="admin-list">
-        {memberships.map((m) => (
-          <div className="admin-card" key={m._id}>
-            <div>
-              <div className="admin-name">{m.userId?.fullName}</div>
-              <div className="admin-email">{m.userId?.email}</div>
-              <div className="admin-status">Status: {m.status}</div>
-            </div>
+          {!loading &&
+            members.map((member) => (
+              <div className="admin-card" key={member._id}>
+                <div className="admin-main">
+                  <div className="admin-name">{member.name}</div>
+                  <div className="admin-email">{member.email}</div>
+                  <div className="admin-status">
+                    Community: {member.communityId?.name || "Not assigned yet"}
+                  </div>
+                  <div className="admin-subtext">
+                    Location: {member.communityId?.location || "—"}
+                  </div>
+                </div>
 
-            {status === "pending" && (
-              <div className="admin-actions">
-                <button className="btn-approve" onClick={() => approve(m.userId?._id)}>
-                  Approve
-                </button>
-                <button className="btn-reject" onClick={() => reject(m.userId?._id)}>
-                  Reject
-                </button>
+                <div className="admin-side">
+                  <div className="admin-badge">
+                    {member.communityId?._id || "No community"}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            ))}
 
-        {memberships.length === 0 && <p>No records.</p>}
+          {!loading && members.length === 0 ? <p>No users found.</p> : null}
+        </div>
       </div>
     </div>
   );

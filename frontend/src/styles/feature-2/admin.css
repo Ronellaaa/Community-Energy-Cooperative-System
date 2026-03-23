@@ -71,6 +71,33 @@
   gap: 10px;
 }
 
+.admin-main {
+  min-width: 0;
+}
+
+.admin-side {
+  display: flex;
+  align-items: center;
+}
+
+.admin-subtext {
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.admin-badge {
+  max-width: 260px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #eef6e6;
+  color: #355b16;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
 .btn-approve,
 .btn-reject {
   border: none;
