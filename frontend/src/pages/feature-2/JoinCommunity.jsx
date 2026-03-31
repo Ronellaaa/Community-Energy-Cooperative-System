@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../api";
 import Navbar from "../../components/Navbar";
 import solarImage from "../../assets/solar.jpg";
-import renewableVideo from "../../assets/renewable.mp4";
+import renewableVideo from "../../assets/re2.mp4";
 import "../../styles/feature-2/JoinCommunity.css";
 
 export default function JoinCommunity() {
