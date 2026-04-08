@@ -43,6 +43,7 @@ export const createMemberPayment = async (req, res) => {
       note,
       createdBy: req.user._id,
     });
+    await FundService.syncProjectFunding(projectId);
     return res.status(201).json({ success: true, data: memberPayment });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -57,7 +58,11 @@ export const getProjectMemberPayments = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid Project ID" });
     }
-    const payments = await FundService.getProjectFundingSummary(projectId);
+    const payments = await MemberPayment.find({ projectId })
+      .populate("memberId", "name email role")
+      .populate("createdBy", "name role")
+      .sort({ date: -1, createdAt: -1 })
+      .lean();
     return res.status(200).json({ success: true, data: payments });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -122,6 +127,7 @@ export const updateMemberPayment = async (req, res) => {
       updateData,
       { new: true, runValidators: true },
     );
+    await FundService.syncProjectFunding(updatedPayment.projectId);
     return res.status(200).json({ success: true, data: updatedPayment });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -139,6 +145,7 @@ export const deleteMemberPayment = async (req, res) => {
         .json({ success: false, message: "Member Payment not found" });
     }
     await MemberPayment.findByIdAndDelete(id);
+    await FundService.syncProjectFunding(memberPayment.projectId);
     return res
       .status(200)
       .json({ success: true, message: "Member Payment deleted" });

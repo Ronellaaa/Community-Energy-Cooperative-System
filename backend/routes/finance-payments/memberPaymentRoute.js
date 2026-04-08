@@ -15,7 +15,6 @@ router.post("/", requireAuth, requireOfficer, createMemberPayment);
 router.get(
   "/project/:projectId",
   requireAuth,
-  requireOfficer,
   getProjectMemberPayments,
 );
 

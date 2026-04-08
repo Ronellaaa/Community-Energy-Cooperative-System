@@ -20,6 +20,8 @@ const projectSchema = new mongoose.Schema({
 
   communityId: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }],
     ref: "Community",
     required: function () {
       return this.projectType === "Community";

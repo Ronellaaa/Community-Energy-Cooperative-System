@@ -21,7 +21,6 @@ router.post(
 router.get(
   "/project/:projectId",
   requireAuth,
-  requireOfficer,
   getProjectMaintenanceExpenses,
 );
 

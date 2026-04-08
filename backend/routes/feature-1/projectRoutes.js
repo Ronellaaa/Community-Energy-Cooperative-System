@@ -18,10 +18,10 @@ const router = express.Router();
 router.post("/", requireAuth, requireOfficer, controller.create);
 
 // Get all projects
-router.get("/", requireAuth, requireOfficer, controller.getAll);
+router.get("/", requireAuth, controller.getAll);
 
 // Get single project by ID
-router.get("/:id", requireAuth, requireOfficer, controller.getOne);
+router.get("/:id", requireAuth, controller.getOne);
 
 // Update project
 router.put("/:id", requireAuth, requireOfficer, controller.update);

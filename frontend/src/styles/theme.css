@@ -1,4 +1,4 @@
-/* Fonts loaded via index.html <link> for reliability in Vite */
+/* 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -29,7 +29,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── BACKGROUND ─────────────────────────────── */
 .bg-orbs {
   position: fixed;
   inset: 0;
@@ -47,7 +46,6 @@ body {
 .orb-2 { width: 450px; height: 450px; background: #f4c43030; bottom: 80px; right: -120px; }
 .orb-3 { width: 350px; height: 350px; background: #2d5a2720; top: 45%; left: 55%; }
 
-/* ─── LAYOUT ─────────────────────────────────── */
 .page-root {
   position: relative;
   z-index: 1;
@@ -55,8 +53,6 @@ body {
   margin: 0 auto;
   padding: 48px 40px 80px;
 }
-
-/* ─── TYPOGRAPHY ─────────────────────────────── */
 .page-title {
   font-family: 'Syne', sans-serif;
   font-size: 44px;
@@ -68,7 +64,6 @@ body {
 .page-title em { color: var(--leaf); font-style: normal; }
 .page-sub { font-size: 14px; color: var(--muted); margin-top: 8px; }
 
-/* ─── BUTTONS ────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -111,7 +106,6 @@ body {
 }
 .btn-outline:hover { background: var(--forest); color: #fff; }
 
-/* ─── CARDS ──────────────────────────────────── */
 .glass-card {
   background: var(--card);
   backdrop-filter: blur(16px);
@@ -120,7 +114,6 @@ body {
   border-radius: var(--radius-lg);
 }
 
-/* ─── FORM FIELDS ────────────────────────────── */
 .field { margin-bottom: 20px; }
 .field label {
   display: block;
@@ -151,7 +144,6 @@ body {
 }
 .field input::placeholder { color: #b8ccb8; }
 
-/* ─── SECTION LABEL ──────────────────────────── */
 .section-label {
   font-family: 'Syne', sans-serif;
   font-size: 11px;
@@ -162,7 +154,6 @@ body {
   margin-bottom: 20px;
 }
 
-/* ─── TYPE BADGE ─────────────────────────────── */
 .type-badge {
   display: inline-flex;
   align-items: center;
@@ -177,7 +168,6 @@ body {
 .badge-wind   { background: rgba(100,181,246,0.18); color: #1565c0; }
 .badge-hydro  { background: rgba(77,182,172,0.18);  color: #00695c; }
 
-/* ─── LOADING ────────────────────────────────── */
 .loading-wrap {
   display: flex;
   flex-direction: column;
@@ -194,4 +184,4 @@ body {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } } */
