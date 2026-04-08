@@ -1,7 +1,6 @@
 // projectRoutes.js
 import express from "express";
 import * as controller from "../../controllers/feature-1/projectController.js";
-import { protect } from "../../middleware/authMiddleware.js";
 // import { authorize } from "../../middleware/roleMiddleware.js";
 // import { validateProject } from "../../middleware/validationMiddleware.js";
 import {
@@ -32,6 +31,9 @@ router.delete("/:id", requireAuth, requireOfficer, controller.deleteProject);
 
 // Approve project
 router.patch("/:id/approve", requireAuth, requireOfficer, controller.approve);
+
+// Reject project
+router.patch("/:id/reject", requireAuth, requireOfficer, controller.reject);
 
 // Activate project
 router.patch("/:id/activate", requireAuth, requireOfficer, controller.activate);

@@ -113,3 +113,16 @@ export const deleteCommunity = async (req, res) => {
 
   res.json({ message: "Community archived (deleted)", id: community._id });
 };
+
+export const getApprovedCommunities = async (req, res) => {
+  try {
+    const communities = await Community.find({
+      isApproved: true,
+      isArchived: false,
+    });
+
+    res.json(communities);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

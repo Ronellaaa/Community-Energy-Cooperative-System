@@ -1,5 +1,6 @@
 import FinanceService from "../../services/finance-payments/financeService.js";
 import FundingRecord from "../../model/finance-payments/fundingRecordModel.js";
+import Project from "../../model/feature-1/Project.js";
 import mongoose from "mongoose";
 
 export const createFundingRecord = async (req, res) => {
@@ -7,23 +8,20 @@ export const createFundingRecord = async (req, res) => {
     const { projectId, sourceId, amount, status, date, note } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid Project ID is required" });
-    }
-    if (!mongoose.Types.ObjectId.isValid(sourceId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid Funding Source ID " });
-    }
-    const amt = Number(amount);
-    if (!Number.isFinite(amt) || amt <= 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Amount must be a positive number" });
+      return res.status(400).json({ success: false, message: "Invalid Project ID" });
     }
 
-    const FundRecord = await FundingRecord.create({
+    if (!mongoose.Types.ObjectId.isValid(sourceId)) {
+      return res.status(400).json({ success: false, message: "Invalid Funding Source ID" });
+    }
+
+    const amt = Number(amount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      return res.status(400).json({ success: false, message: "Amount must be positive" });
+    }
+
+    // ✅ CREATE FUNDING RECORD
+    const fundRecord = await FundingRecord.create({
       projectId,
       sourceId,
       amount: amt,
@@ -32,7 +30,38 @@ export const createFundingRecord = async (req, res) => {
       note,
       createdBy: req.user._id,
     });
-    return res.status(201).json({ success: true, data: FundRecord });
+
+    // 🔥 NEW: CALCULATE TOTAL FUNDING
+    const totalResult = await FundingRecord.aggregate([
+      { $match: { projectId: new mongoose.Types.ObjectId(projectId), status: "RECEIVED" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    const totalFunding = totalResult[0]?.total || 0;
+
+    // 🔥 UPDATE PROJECT
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ success: false, message: "Project not found" });
+    }
+
+    project.totalFunding = totalFunding;
+
+    // 🔥 AUTO ACTIVATE LOGIC
+    if (totalFunding >= project.cost && project.status === "Approved") {
+      project.status = "Active";
+    }
+
+    await project.save();
+
+    return res.status(201).json({
+      success: true,
+      data: fundRecord,
+      totalFunding,
+      projectStatus: project.status,
+    });
+
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
