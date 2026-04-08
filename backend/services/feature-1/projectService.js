@@ -15,11 +15,11 @@ export const createProject = async (data) => {
 };
 
 export const getAllProjects = async () => {
-  return await Project.find();
+  return await Project.find().populate("assignedMembers", "name email");
 };
 
 export const getProjectById = async (id) => {
-  return await Project.findById(id);
+  return await Project.findById(id).populate("assignedMembers", "name email");
 };
 
 export const updateProject = async (id, data) => {

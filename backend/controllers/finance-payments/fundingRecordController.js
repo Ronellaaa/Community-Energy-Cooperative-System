@@ -32,7 +32,29 @@ export const createFundingRecord = async (req, res) => {
       note,
       createdBy: req.user._id,
     });
+    await FinanceService.syncProjectFunding(projectId);
     return res.status(201).json({ success: true, data: FundRecord });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getProjectFundingRecords = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid Project ID" });
+    }
+
+    const records = await FundingRecord.find({ projectId })
+      .populate("sourceId", "fundName fundType isActive")
+      .populate("createdBy", "name role")
+      .sort({ date: -1, createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({ success: true, data: records });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -106,13 +128,15 @@ export const updateFundingRecord = async (req, res) => {
     if (date !== undefined) updateRecord.date = new Date(date);
     if (note !== undefined) updateRecord.note = note;
 
-    const updateFundingRecord = await FundingRecord.findByIdAndUpdate(
+    const updatedFundingRecord = await FundingRecord.findByIdAndUpdate(
       id,
       updateRecord,
       { new: true, runValidators: true },
     );
 
-    return res.status(200).json({ success: true, data: updateFundingRecord });
+    await FinanceService.syncProjectFunding(updatedFundingRecord.projectId);
+
+    return res.status(200).json({ success: true, data: updatedFundingRecord });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -134,6 +158,8 @@ export const deleteFundingRecord = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Funding Record not found" });
     }
+
+    await FinanceService.syncProjectFunding(fundingReord.projectId);
 
     return res
       .status(200)

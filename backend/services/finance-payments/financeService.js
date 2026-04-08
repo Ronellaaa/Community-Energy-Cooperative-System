@@ -5,22 +5,53 @@ import Project from "../../model/feature-1/Project.js";
 import mongoose from "mongoose";
 
 const FinanceService = {
+  syncProjectFunding: async (projectId) => {
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      throw new Error("Invalid project ID");
+    }
+
+    const objectId = new mongoose.Types.ObjectId(projectId);
+
+    const [receivedFunding, memberCollections] = await Promise.all([
+      FundingRecord.aggregate([
+        { $match: { projectId: objectId, status: "RECEIVED" } },
+        { $group: { _id: null, total: { $sum: "$amount" } } },
+      ]),
+      MemberPayment.aggregate([
+        {
+          $match: {
+            projectId: objectId,
+            paymentType: { $in: ["JOINING", "OTHER"] },
+          },
+        },
+        { $group: { _id: null, total: { $sum: "$amount" } } },
+      ]),
+    ]);
+
+    const totalFunding =
+      Number(receivedFunding[0]?.total || 0) + Number(memberCollections[0]?.total || 0);
+
+    await Project.findByIdAndUpdate(projectId, { totalFunding });
+    return totalFunding;
+  },
+
   getProjectFundingSummary: async (projectId) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(projectId)) {
         throw new Error("Invalid project ID");
       }
 
+      const objectId = new mongoose.Types.ObjectId(projectId);
       const project = await Project.findById(projectId)
-        .select("estimatedCost")
+        .select("name cost totalFunding status")
         .lean();
 
       if (!project) throw new Error("Project not found");
 
-      const projectCost = Number(Project.totalFunding || 0);
+      const projectCost = Number(project.cost || 0);
 
       const fundingAggregation = await FundingRecord.aggregate([
-        { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
+        { $match: { projectId: objectId } },
         { $group: { _id: "$status", total: { $sum: "$amount" } } },
       ]);
 
@@ -33,7 +64,7 @@ const FinanceService = {
       );
 
       const memberPaymentAggregation = await MemberPayment.aggregate([
-        { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
+        { $match: { projectId: objectId } },
         { $group: { _id: "$paymentType", total: { $sum: "$amount" } } },
       ]);
 
@@ -50,7 +81,7 @@ const FinanceService = {
       );
 
       const maintenanceExpenseAggregation = await MaintenanceExpense.aggregate([
-        { $match: { projectId: new mongoose.Types.ObjectId(projectId) } },
+        { $match: { projectId: objectId } },
         { $group: { _id: null, total: { $sum: "$amount" } } },
       ]);
 
@@ -65,6 +96,8 @@ const FinanceService = {
 
       return {
         projectId,
+        projectName: project.name,
+        projectStatus: project.status,
         projectCost,
         totalPromised,
         totalReceived,
@@ -74,6 +107,7 @@ const FinanceService = {
         maintenanceFundBalance,
         availableForInstallation,
         remainingGap,
+        totalFunding: Number(project.totalFunding || 0),
       };
     } catch (error) {
       throw new Error(

@@ -14,7 +14,7 @@ const projectSchema = new mongoose.Schema({
 
   assignedMembers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Member"
+    ref: "User"
   }],
 
   expectedMonthlyGeneration: { type: Number, default: 0 },

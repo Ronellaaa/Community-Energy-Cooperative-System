@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import FundService from "../../services/finance-payments/financeService.js";
 import MaintenanceExpense from "../../model/finance-payments/maintenanceExpenseModel.js";
 
 export const createMaintenanceExpense = async (req, res) => {
@@ -13,7 +12,7 @@ export const createMaintenanceExpense = async (req, res) => {
     }
     const amt = Number(amount);
 
-    if (!Number.isFinite(amount) || amt <= 0) {
+    if (!Number.isFinite(amt) || amt <= 0) {
       return res
         .status(400)
         .json({ success: false, message: "Amount must be a positive number" });
@@ -40,8 +39,10 @@ export const getProjectMaintenanceExpenses = async (req, res) => {
         .json({ success: false, message: "Invalid Project ID" });
     }
 
-    const getMaintenanceExpenses =
-      await FundService.getProjectFundingSummary(projectId);
+    const getMaintenanceExpenses = await MaintenanceExpense.find({ projectId })
+      .populate("createdBy", "name role")
+      .sort({ date: -1, createdAt: -1 })
+      .lean();
     return res
       .status(200)
       .json({ success: true, data: getMaintenanceExpenses });
