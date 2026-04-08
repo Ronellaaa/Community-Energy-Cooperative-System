@@ -1,5 +1,5 @@
 // controllers/billController.js
-import { createBill as createBillService, getBills as getBillsService, getBillById as getBillByIdService, updateBill as updateBillService, deleteBill as deleteBillService   } from '../../service/feature-3/client.bill.service.js';
+import { createBill as createBillService, getBills as getBillsService, getBillById as getBillByIdService, updateBill as updateBillService, deleteBill as deleteBillService, getUserBillSummaryService    } from '../../service/feature-3/client.bill.service.js';
 
 import fs from 'fs';
 
@@ -159,6 +159,27 @@ export const deleteBill = async (req, res) => {
       });
     }
     
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const getUserBillSummary = async (req, res) => {
+  try {
+    const summary = await getUserBillSummaryService();
+    
+    res.json({
+      success: true,
+      userId: summary.userId,
+      summary: {
+        bills: summary.bills,
+        financials: summary.financials,
+        credits: summary.credits
+      }
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message

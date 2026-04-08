@@ -39,4 +39,9 @@ const EnergySettlementSchema = new mongoose.Schema({
   }
 });
 
+EnergySettlementSchema.pre('save', function(next) {
+  this.totalCredits = this.tariffRate * this.totalEnergyProducedKWh;
+  next(); // Call next() when done
+});
+
 export default mongoose.model("EnergySettlement", EnergySettlementSchema);

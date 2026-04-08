@@ -127,14 +127,14 @@ CreditSchema.pre('validate', async function() {
   }
 });
 
-// ✅ SINGLE pre-save hook - does everything in one place
+// SINGLE pre-save hook - does everything in one place
 CreditSchema.pre('save', function() {
   console.log('🔄 Credit pre-save hook running for:', this._id);
   
-  // 1. Update timestamp
+  //Update timestamp
   this.updatedAt = Date.now();
   
-  // 2. Update isFullyUsed based on remainingAmount
+  //Update isFullyUsed based on remainingAmount
   this.isFullyUsed = this.remainingAmount <= 0;
   
   console.log('   remainingAmount:', this.remainingAmount);
@@ -142,7 +142,7 @@ CreditSchema.pre('save', function() {
   
 });
 
-// Indexes for common queries
+//Indexes for common queries
 CreditSchema.index({ userId: 1, isFullyUsed: 1 });
 CreditSchema.index({ userId: 1, billingPeriod: 1 });
 CreditSchema.index({ 'usageHistory.billId': 1 });

@@ -62,15 +62,15 @@ export default async function distributeCredits(projectId, billingPeriod) {
   if (members.length > 0 && communityPool > 0) {
     const memberShare = Math.round(communityPool / members.length);
     for (const member of members) {
-      // ✅ FIXED: Include all required fields
+      
       const credit = await Credit.create({
         userId: member._id,
         projectId: projectObjectId,
         billingPeriod,
         settlementId: settlementObjectId,
         creditAmount: memberShare,
-        originalAmount: memberShare,     // ✅ Added - required by Credit model
-        remainingAmount: memberShare,    // ✅ Added - required by Credit model
+        originalAmount: memberShare,     
+        remainingAmount: memberShare,    
         createdBy: "system"
       });
       creditRecords.push(credit);
@@ -97,14 +97,14 @@ export default async function distributeCredits(projectId, billingPeriod) {
         creditAmount = Math.round(userShare * investorPool);
       }
 
-      // ✅ FIXED: Include all required fields
+      //  FIXED: Include all required fields
       const credit = await Credit.create({
         userId: investor._id,
         projectId: projectObjectId,
         billingPeriod,
         settlementId: settlementObjectId,
-        originalAmount: creditAmount,    // ✅ Added - required by Credit model
-        remainingAmount: creditAmount,   // ✅ Added - required by Credit model
+        originalAmount: creditAmount,    
+        remainingAmount: creditAmount,   
         createdBy: "system"
       });
       creditRecords.push(credit);

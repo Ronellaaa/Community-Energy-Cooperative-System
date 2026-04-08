@@ -30,7 +30,9 @@ export const createOfficer = async (req, res) => {
 
 // List OFFICERS
 export const listOfficers = async (req, res) => {
-  const officers = await User.find({ role: "OFFICER" }).select("-passwordHash");
+  const officers = await User.find({ role: "OFFICER" })
+    .select("-passwordHash")
+    .populate("communityId", "name location");
   res.json(officers);
 };
 
@@ -130,4 +132,11 @@ export const unarchiveOfficer = async (req, res) => {
   await officer.save();
 
   res.json({ message: "Officer unarchived", id: officer._id });
+};
+
+export const listUsers = async (req, res) => {
+  const users = await User.find({ role: "USER", isArchived: { $ne: true } })
+    .select("-passwordHash")
+    .populate("communityId", "name location");
+  res.json(users);
 };

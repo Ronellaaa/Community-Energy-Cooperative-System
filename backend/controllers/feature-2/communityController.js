@@ -1,5 +1,6 @@
 import Community from "../../model/Community.js";
-
+import User from "../../model/User.js";
+import mongoose from "mongoose";
 export const listCommunities = async (req, res) => {
   const { search = "", page = "1", limit = "10" } = req.query;
   const p = Math.max(1, Number(page));
@@ -14,25 +15,55 @@ export const listCommunities = async (req, res) => {
     ];
   }
 
-  const [items, total] = await Promise.all([
+  const [items, total, memberCounts] = await Promise.all([
     Community.find(q).sort({ createdAt: -1 }).skip(skip).limit(l),
     Community.countDocuments(q),
+    User.aggregate([
+      {
+        $match: {
+          role: "USER",
+          isArchived: { $ne: true },
+          communityId: { $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: "$communityId",
+          memberCount: { $sum: 1 },
+        },
+      },
+    ]),
   ]);
 
-  res.json({ items, total, page: p, limit: l });
+  const memberCountMap = new Map(
+    memberCounts.map((entry) => [String(entry._id), entry.memberCount]),
+  );
+
+  const itemsWithCounts = items.map((community) => ({
+    ...community.toObject(),
+    memberCount: memberCountMap.get(String(community._id)) || 0,
+  }));
+
+  res.json({ items: itemsWithCounts, total, page: p, limit: l });
 };
 
 export const getCommunity = async (req, res) => {
   const community = await Community.findById(req.params.id);
-  if (!community || community.isArchived) return res.status(404).json({ message: "Community not found" });
+  if (!community || community.isArchived)
+    return res.status(404).json({ message: "Community not found" });
   res.json(community);
 };
 
 export const createCommunity = async (req, res) => {
   const { name, location } = req.body;
-  if (!name || !location) return res.status(400).json({ message: "name and location required" });
+  if (!name || !location)
+    return res.status(400).json({ message: "name and location required" });
 
-  const community = await Community.create({ name, location, createdBy: req.user._id });
+  const community = await Community.create({
+    name,
+    location,
+    createdBy: req.user._id,
+  });
   res.status(201).json(community);
 };
 
@@ -47,7 +78,9 @@ export const updateCommunity = async (req, res) => {
 
   // 🔒 only the officer who created it can edit
   if (String(community.createdBy) !== String(req.user._id)) {
-    return res.status(403).json({ message: "You can only update your own communities" });
+    return res
+      .status(403)
+      .json({ message: "You can only update your own communities" });
   }
 
   const { name, location } = req.body;
@@ -69,7 +102,9 @@ export const deleteCommunity = async (req, res) => {
 
   // 🔒 only the officer who created it can delete
   if (String(community.createdBy) !== String(req.user._id)) {
-    return res.status(403).json({ message: "You can only delete your own communities" });
+    return res
+      .status(403)
+      .json({ message: "You can only delete your own communities" });
   }
 
   // ✅ soft delete
@@ -77,4 +112,17 @@ export const deleteCommunity = async (req, res) => {
   await community.save();
 
   res.json({ message: "Community archived (deleted)", id: community._id });
+};
+
+export const getApprovedCommunities = async (req, res) => {
+  try {
+    const communities = await Community.find({
+      isApproved: true,
+      isArchived: false,
+    });
+
+    res.json(communities);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

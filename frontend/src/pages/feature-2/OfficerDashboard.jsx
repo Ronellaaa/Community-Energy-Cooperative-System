@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiRequest } from "../../api";
+import Navbar from "../../components/Navbar";
 import "../../styles/feature-2/officerDashboard.css";
 
 export default function OfficerDashboard() {
   return (
     <div className="od-page">
+      <Navbar />
       {/* ✅ NEW: Communities section at the top */}
       <OfficerCommunitiesSection />
 

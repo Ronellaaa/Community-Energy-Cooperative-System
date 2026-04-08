@@ -5,14 +5,14 @@ import Credit from '../../model/feature-3/Credit.js';
 import upload from '../../middleware/feature-3/upload.js';
 import cloudinary from '../../config/feature-3/cloudinary.js';
 import fs from 'fs';
-import { createBill,getBills,  getBillById, updateBill, deleteBill    } from '../../controllers/feature-3/bill.controller.js';
+import { createBill,getBills,  getBillById, updateBill, deleteBill, getUserBillSummary     } from '../../controllers/feature-3/bill.controller.js';
 
 
 const router = express.Router();
 
 
 
-const TEST_USER_ID = new mongoose.Types.ObjectId("642f20000000000000000001");
+const TEST_USER_ID = new mongoose.Types.ObjectId("444444444444444444444443");
 
 // CREATE BILL - POST(BY THE CLIENT)
 router.post('/', upload.fields([
@@ -36,6 +36,9 @@ router.put('/:id', upload.fields([
 
 // DELETE PENDING BILL - DELETE (BY THE CLIENT)
 router.delete('/:id', deleteBill); 
+
+// Get the bill summary for the user (BY THE CLIENT)
+router.get('/summary/user', getUserBillSummary);
 
 
 
@@ -607,7 +610,7 @@ router.post('/', upload.single('billImage'), async (req, res) => {
 // ============================================
 // GET USER BILL SUMMARY - GET
 // ============================================
-router.get('/summary/user', async (req, res) => {
+/*router.get('/summary/user', async (req, res) => {
   try {
     const bills = await Bill.find({ userId: TEST_USER_ID });
     
@@ -654,7 +657,7 @@ router.get('/summary/user', async (req, res) => {
       message: error.message
     });
   }
-});
+});*/
 
 // ============================================
 // GET OVERDUE BILLS - GET

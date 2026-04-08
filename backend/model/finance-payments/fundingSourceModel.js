@@ -20,6 +20,12 @@ const fundingSourceSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    creditsReceived: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   { timestamps: true },
 );
