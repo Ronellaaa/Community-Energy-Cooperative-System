@@ -5,7 +5,13 @@ import { apiRequest } from "../../api";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "" });
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "USER",
+  });
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +40,7 @@ export default function Register() {
           email: form.email,
           phone: form.phone || undefined,
           password: form.password,
+          role: form.role,
         },
       });
 
@@ -82,6 +89,18 @@ export default function Register() {
             placeholder="you@example.com"
             required
           />
+
+          <label className="label">Role</label>
+          <select
+            className="input"
+            name="role"
+            value={form.role}
+            onChange={onChange}
+          >
+            <option value="USER">User</option>
+            <option value="OFFICER">Officer</option>
+            <option value="ADMIN">Admin</option>
+          </select>
 
           <label className="label">Password</label>
           <input

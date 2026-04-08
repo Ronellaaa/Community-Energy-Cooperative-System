@@ -1,8 +1,10 @@
 import bg from "../../assets/bg.png";
+import Navbar from "../../components/Navbar";
 
 export default function ImageAuthLayout({ children }) {
   return (
     <div className="img-auth-page">
+      <Navbar />
       <img className="img-auth-bg" src={bg} alt="background" />
 
       {/* ✅ TEXT overlay (NOT inside white-area-box) */}
