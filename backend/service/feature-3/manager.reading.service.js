@@ -1,17 +1,44 @@
-import MemberConsumption from '../models/MemberConsumption.js';
+import MemberConsumption from '../../model/feature-3/MemberConsumption.js';
+import PaymentSlip from '../../model/feature-3/PaymentSlip.js';
+
+export const getPreviousBillingPeriod = (month, year) => ({
+  previousMonth: month === 1 ? 12 : month - 1,
+  previousYear: month === 1 ? year - 1 : year,
+});
 
 // Get previous reading for a member
-export const getPreviousReading = async (memberId, month, year) => {
-  const previousMonth = month === 1 ? 12 : month - 1;
-  const previousYear = month === 1 ? year - 1 : year;
+export const getPreviousReading = async (memberId, communityId, month, year) => {
+  const { previousMonth, previousYear } = getPreviousBillingPeriod(month, year);
   
   const lastRecord = await MemberConsumption.findOne({
     memberId,
+    communityId,
     'billingPeriod.month': previousMonth,
     'billingPeriod.year': previousYear
   });
   
   return lastRecord ? lastRecord.currentReading : null;
+};
+
+export const getPreviousReadingDetails = async (memberId, communityId, month, year) => {
+  const { previousMonth, previousYear } = getPreviousBillingPeriod(month, year);
+
+  const lastRecord = await MemberConsumption.findOne({
+    memberId,
+    communityId,
+    'billingPeriod.month': previousMonth,
+    'billingPeriod.year': previousYear
+  });
+
+  return {
+    memberId,
+    communityId,
+    previousReading: lastRecord ? lastRecord.currentReading : null,
+    previousReadingFound: Boolean(lastRecord),
+    sourceBillingPeriod: lastRecord
+      ? { month: previousMonth, year: previousYear }
+      : null,
+  };
 };
 
 // Save a reading
@@ -21,6 +48,7 @@ export const saveReading = async (data) => {
   const consumption = await MemberConsumption.findOneAndUpdate(
     {
       memberId: data.memberId,
+      communityId: data.communityId,
       'billingPeriod.month': data.month,
       'billingPeriod.year': data.year
     },
@@ -51,14 +79,61 @@ export const getReadingsByPeriod = async (communityId, month, year) => {
 
 // Get reading history for a member
 export const getMemberHistory = async (memberId) => {
-  return await MemberConsumption.find({
+  const records = await MemberConsumption.find({
     memberId
   }).sort({ 'billingPeriod.year': -1, 'billingPeriod.month': -1 });
+
+  return await attachLatestPaymentSlip(records);
+};
+
+export const getMemberHistoryByCommunity = async (memberId, communityId) => {
+  const records = await MemberConsumption.find({
+    memberId,
+    communityId,
+  }).sort({ 'billingPeriod.year': -1, 'billingPeriod.month': -1 });
+
+  return await attachLatestPaymentSlip(records);
+};
+
+const attachLatestPaymentSlip = async (records) => {
+  if (records.length === 0) {
+    return [];
+  }
+
+  const recordIds = records.map((record) => record._id);
+  const paymentSlips = await PaymentSlip.find({
+    memberConsumptionId: { $in: recordIds },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const latestSlipByConsumptionId = new Map();
+
+  paymentSlips.forEach((paymentSlip) => {
+    const key = String(paymentSlip.memberConsumptionId);
+    if (!latestSlipByConsumptionId.has(key)) {
+      latestSlipByConsumptionId.set(key, paymentSlip);
+    }
+  });
+
+  return records.map((record) => ({
+    ...record.toObject(),
+    latestPaymentSlip: latestSlipByConsumptionId.get(String(record._id)) || null,
+  }));
 };
 
 // ============ GET - Get single reading by ID ============
 export const getReadingById = async (id) => {
   return await MemberConsumption.findById(id);
+};
+
+export const getReadingByPeriod = async (memberId, communityId, month, year) => {
+  return await MemberConsumption.findOne({
+    memberId,
+    communityId,
+    'billingPeriod.month': month,
+    'billingPeriod.year': year
+  });
 };
 
 // ============ PUT - Full update by ID ============
@@ -86,10 +161,11 @@ export const patchReadingById = async (id, updateData) => {
 };
 
 // ============ PATCH - Partial update by member and period ============
-export const patchReadingByPeriod = async (memberId, month, year, updateData) => {
+export const patchReadingByPeriod = async (memberId, communityId, month, year, updateData) => {
   return await MemberConsumption.findOneAndUpdate(
     {
       memberId,
+      communityId,
       'billingPeriod.month': month,
       'billingPeriod.year': year
     },

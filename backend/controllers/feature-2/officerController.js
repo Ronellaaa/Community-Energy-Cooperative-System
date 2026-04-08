@@ -1,8 +1,14 @@
 import JoinRequest from "../../model/JoinRequest.js";
 import User from "../../model/User.js";
+import { generateAndUploadQR } from "../../service/feature-3/qrService.js";
 
 export const listJoinRequests = async (req, res) => {
-  const { status = "PENDING", page = "1", limit = "10", search = "" } = req.query;
+  const {
+    status = "PENDING",
+    page = "1",
+    limit = "10",
+    search = "",
+  } = req.query;
   const p = Math.max(1, Number(page));
   const l = Math.min(50, Math.max(1, Number(limit)));
   const skip = (p - 1) * l;
@@ -32,7 +38,8 @@ export const listJoinRequests = async (req, res) => {
 export const approveJoinRequest = async (req, res) => {
   const jr = await JoinRequest.findById(req.params.id);
   if (!jr) return res.status(404).json({ message: "Request not found" });
-  if (jr.status !== "PENDING") return res.status(400).json({ message: "Only PENDING can be approved" });
+  if (jr.status !== "PENDING")
+    return res.status(400).json({ message: "Only PENDING can be approved" });
 
   jr.status = "APPROVED";
   jr.reviewedBy = req.user._id;
@@ -41,13 +48,28 @@ export const approveJoinRequest = async (req, res) => {
 
   await User.findByIdAndUpdate(jr.userId, { communityId: jr.communityId });
 
+  // Qr web-hook calling
+  let qrGeneration = "success";
+  try {
+    await generateAndUploadQR(String(jr.userId), String(jr.communityId));
+    console.log("QR generated for member:", String(jr.userId));
+  } catch (e) {
+    qrGeneration = "failed";
+    console.error(
+      "QR generation failed for member:",
+      String(jr.userId),
+      e.message,
+    );
+  }
+
   res.json(jr);
 };
 
 export const rejectJoinRequest = async (req, res) => {
   const jr = await JoinRequest.findById(req.params.id);
   if (!jr) return res.status(404).json({ message: "Request not found" });
-  if (jr.status !== "PENDING") return res.status(400).json({ message: "Only PENDING can be rejected" });
+  if (jr.status !== "PENDING")
+    return res.status(400).json({ message: "Only PENDING can be rejected" });
 
   jr.status = "REJECTED";
   jr.rejectionReason = req.body.reason || "Rejected";
