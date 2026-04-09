@@ -1,8 +1,8 @@
-// src/components/projects/CreateProject.jsx
+
 import { useState, useEffect } from "react";
 import { projectApi, communityApi } from "../../api";
-import { useNavigate } from "react-router-dom";
-import {
+import { formatLKR } from "../../utils/feature-1/formatCurrency";
+import { useNavigate, useParams } from "react-router-dom";import {
   pageWrapperStyle,
   glassPanelStyle,
   inputStyle,
@@ -15,48 +15,31 @@ import {
   TYPE_ICONS,
 } from "../../components/feature-1/UI";
 
-
-const PROJECT_TYPES = ["Company", "Community"];
 const ENERGY_TYPES = ["Solar", "Wind", "Hydro"];
 
 export default function CreateProject() {
   const navigate = useNavigate();
+  const { communityId } = useParams();
 
   const [form, setForm] = useState({
     name: "",
-    projectType: "Company", // Make sure this is set
+    projectType: "Community",
     type: "Solar",
     capacityKW: "",
     cost: "",
-    communityId: "",
-  });
+});
 
-  const [communities, setCommunities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
-
-  const fetchCommunities = async () => {
-  try {
-    const res = await communityApi.getApproved(); // 👈 NEW API
-
-    setCommunities(res); // already approved from backend
-  } catch (err) {
-    console.error(err.message);
-  }
-};
+  
 
   const validateForm = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Project name is required";
     if (!form.capacityKW || form.capacityKW <= 0) newErrors.capacityKW = "Valid capacity is required";
     if (!form.cost || form.cost <= 0) newErrors.cost = "Valid cost is required";
-    if (form.projectType === "Community" && !form.communityId) {
-      newErrors.communityId = "Please select a community";
-    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,16 +55,12 @@ export default function CreateProject() {
     try {
       const payload = {
         name: form.name,
-        projectType: form.projectType,
+        projectType: "Community",
         type: form.type,
         capacityKW: Number(form.capacityKW),
         cost: Number(form.cost),
-      };
-      
-      // Only add communityId if projectType is Community
-      if (form.projectType === "Community" && form.communityId) {
-        payload.communityId = form.communityId;
-      }
+        communityId: communityId,
+        };
       
       console.log("Sending payload:", payload); // Debug log
       
@@ -134,70 +113,6 @@ export default function CreateProject() {
                 />
                 {errors.name && <span style={{ color: "#f87171", fontSize: "11px", marginTop: "4px" }}>{errors.name}</span>}
               </FormField>
-
-              {/* Project Type Toggle */}
-              <FormField label="Project Type">
-                <div style={{ display: "flex", gap: "10px" }}>
-                  {PROJECT_TYPES.map((pt) => (
-                    <button
-                      key={pt}
-                      type="button"
-                      onClick={() => {
-                        setForm({ ...form, projectType: pt, communityId: "" });
-                        if (errors.communityId) setErrors({ ...errors, communityId: null });
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: "11px",
-                        borderRadius: "10px",
-                        border: form.projectType === pt
-                          ? "1px solid rgba(34,197,94,0.6)"
-                          : "1px solid rgba(255,255,255,0.1)",
-                        background: form.projectType === pt
-                          ? "rgba(34,197,94,0.15)"
-                          : "rgba(255,255,255,0.04)",
-                        color: form.projectType === pt ? "#4ade80" : "#8aad92",
-                        fontWeight: "600",
-                        fontSize: "13px",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                        letterSpacing: "0.03em",
-                      }}
-                    >
-                      {pt === "Company" ? "◈ Company" : "◉ Community"}
-                    </button>
-                  ))}
-                </div>
-              </FormField>
-
-              {/* Community selector — only for Community type */}
-              {form.projectType === "Community" && (
-                <FormField label="Linked Community">
-                  <select
-                    className="eco-input"
-                    style={inputStyle}
-                    required
-                    value={form.communityId}
-                    onChange={(e) => {
-                      setForm({ ...form, communityId: e.target.value });
-                      if (errors.communityId) setErrors({ ...errors, communityId: null });
-                    }}
-                  >
-                    <option value="">Select an approved community</option>
-                    {communities.map((c) => (
-                      <option key={c._id} value={c._id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.communityId && <span style={{ color: "#f87171", fontSize: "11px", marginTop: "4px" }}>{errors.communityId}</span>}
-                  {communities.length === 0 && (
-                    <p style={{ color: "#fbbf24", fontSize: "11px", marginTop: "4px" }}>
-                      No approved communities available. Please contact admin.
-                    </p>
-                  )}
-                </FormField>
-              )}
 
               {/* Energy Type */}
               <FormField label="Energy Source">

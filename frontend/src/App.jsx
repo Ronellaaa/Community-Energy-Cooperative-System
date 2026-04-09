@@ -6,6 +6,8 @@ import CreateProjectPage from "./pages/feature-1/CreateProject.jsx";
 import ProjectDetailPage from "./pages/feature-1/ProjectDetails.jsx";
 import EditProjectPage from "./pages/feature-1/EditProject.jsx";
 import BillForm from "./components/BillFormFeature3";
+import UserProjects from "./pages/feature-1/UserProjects.jsx";  
+import UserProjectDetails from "./pages/feature-1/UserProjectDetails.jsx";
 import FinanceDashboard from "./pages/finance-payments/Finance-Dashboard.jsx";
 import FinanceEditItemPage from "./pages/finance-payments/Finance-EditItem.jsx";
 import FinanceSourcesPage from "./pages/finance-payments/Finance-Sources.jsx";
@@ -22,6 +24,7 @@ import "./styles/feature-2/auth.css";
 import ProtectedRoute from "./components/feature-2/ProtectedRoute";
 import JoinCommunity from "./pages/feature-2/JoinCommunity";
 import AdminOfficers from "./pages/feature-2/AdminOfficers";
+//import FundingRecord from "./pages/feature-3/FundingRecord.jsx";
 
 import "./App.css";
 
@@ -32,9 +35,13 @@ export default function App() {
         {/* Redirect root */}
         {/* Project routes */}
         <Route path="/projects" element={<ProjectsListPage />} />
-        <Route path="/projects/create" element={<CreateProjectPage />} />
-        <Route path="/projects/:id" element={<ProjectDetailPage />} />
+
+        <Route path="/projects/create/:communityId" element={<CreateProjectPage />} />
         <Route path="/projects/:id/edit" element={<EditProjectPage />} />
+        <Route path="/my-projects/:communityId" element={<UserProjects />} />
+        <Route path="/projects/:id" element={<ProjectDetailPage />} />
+        <Route path="/user/project/:id"element={<UserProjectDetails />}/>
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route
           path="/finance-payments/dashboard"
           element={
@@ -105,6 +112,7 @@ export default function App() {
         <Route path="/join-community" element={<JoinCommunity />} />
         <Route path="/officer/dashboard" element={<OfficerDashboard />} />
         <Route path="/admin/officers" element={<AdminOfficers />} />
+        {/* <Route path="/funding-record/:projectId" element={<FundingRecord />} /> */}333333333333333333
         
         <Route
           path="/add-bill"

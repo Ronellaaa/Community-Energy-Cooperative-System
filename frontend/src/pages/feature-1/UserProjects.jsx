@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { projectApi } from "../../api";
 import { formatLKR } from "../../utils/feature-1/formatCurrency";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   pageWrapperStyle,
   glassPanelStyle,
@@ -130,97 +129,31 @@ function EmptyState() {
       <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.4 }}>☀</div>
       <p style={{ color: "#6abf7b", fontSize: "15px", fontWeight: "600", margin: "0 0 6px" }}>No projects yet</p>
       <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "13px", margin: 0 }}>
-        Create your first energy project to get started.
+        No projects found for this community.
       </p>
     </div>
   );
 }
 
-function FilterTab({ label, active, onClick, count }) {
-  const statusColors = {
-    All: { bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
-    Pending: { bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.35)", text: "#fbbf24" },
-    Approved: { bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
-    Rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.35)", text: "#f87171" },
-    Active: { bg: "rgba(14,165,233,0.12)", border: "rgba(14,165,233,0.35)", text: "#38bdf8" },
-  };
-
-  const colors = statusColors[label] || statusColors.All;
-
-  return (
-    <button
-      onClick={onClick}
-      className="filter-tab"
-      style={{
-        padding: "8px 16px",
-        borderRadius: "20px",
-        fontSize: "13px",
-        fontWeight: "600",
-        cursor: "pointer",
-        transition: "all 0.2s ease",
-        background: active ? colors.bg : "rgba(255,255,255,0.04)",
-        border: active ? `1px solid ${colors.border}` : "1px solid rgba(255,255,255,0.08)",
-        color: active ? colors.text : "#8aad92",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-      }}
-      onMouseEnter={(e) => {
-        if (!active) {
-          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-          e.currentTarget.style.transform = "translateY(-1px)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!active) {
-          e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-          e.currentTarget.style.transform = "translateY(0)";
-        }
-      }}
-    >
-      {label}
-      {count != null && (
-        <span
-          style={{
-            fontSize: "11px",
-            padding: "2px 8px",
-            borderRadius: "12px",
-            background: active ? colors.bg : "rgba(255,255,255,0.08)",
-            color: active ? colors.text : "#8aad92",
-          }}
-        >
-          {count}
-        </span>
-      )}
-    </button>
-  );
-}
-
-const FILTERS = ["All", "Pending", "Approved", "Rejected", "Active"];
-
-export default function ProjectList() {
+export default function UserProjects() {
   const [projects, setProjects] = useState([]);
-  const [filter, setFilter] = useState("All");
   const navigate = useNavigate();
+  const { communityId } = useParams();
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (communityId) {
+      fetchProjects();
+    }
+  }, [communityId]);
 
   const fetchProjects = async () => {
     try {
-      const data = await projectApi.getAll();
+      const data = await projectApi.getByCommunity(communityId);
       setProjects(data);
     } catch (err) {
       alert(err.message);
     }
   };
-
-  const filtered = filter === "All"
-    ? projects
-    : projects.filter((p) => p.status === filter);
-
-  const countFor = (s) => s === "All" ? projects.length : projects.filter((p) => p.status === s).length;
 
   return (
     <div style={pageWrapperStyle}>
@@ -257,112 +190,18 @@ export default function ProjectList() {
       <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 24px" }}>
 
         <PageHeader
-          title="Energy Projects"
-          subtitle={`${projects.length} project${projects.length !== 1 ? "s" : ""} in your portfolio`}
-          action={
-            <Link
-              to="/projects/create/:communityId"
-              className="create-btn"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "11px 20px",
-                background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                border: "none",
-                borderRadius: "10px",
-                color: "#fff",
-                fontWeight: "700",
-                fontSize: "13px",
-                textDecoration: "none",
-                letterSpacing: "0.03em",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 8px 20px rgba(34,197,94,0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              + New Project
-            </Link>
-          }
+          title="Community Projects"
+          subtitle={`${projects.length} project${projects.length !== 1 ? "s" : ""} available`}
         />
-
-        {/* Stats row - Light colored status cards */}
-        {projects.length > 0 && (
-          <div
-            style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}
-            className="fade-up fade-up-1"
-          >
-            {[
-              { status: "Pending", color: "#fbbf24", bgColor: "rgba(245,158,11,0.12)", borderColor: "rgba(245,158,11,0.3)" },
-              { status: "Approved", color: "#4ade80", bgColor: "rgba(34,197,94,0.12)", borderColor: "rgba(34,197,94,0.3)" },
-              { status: "Active", color: "#38bdf8", bgColor: "rgba(14,165,233,0.12)", borderColor: "rgba(14,165,233,0.3)" },
-              { status: "Rejected", color: "#f87171", bgColor: "rgba(239,68,68,0.12)", borderColor: "rgba(239,68,68,0.3)" },
-            ].map(({ status, color, bgColor, borderColor }) => {
-              const c = countFor(status);
-              return (
-                <div
-                  key={status}
-                  onClick={() => setFilter(filter === status ? "All" : status)}
-                  className="stat-card"
-                  style={{
-                    padding: "16px 20px",
-                    background: filter === status ? bgColor : "rgba(255,255,255,0.04)",
-                    border: filter === status ? `1px solid ${borderColor}` : "1px solid rgba(255,255,255,0.07)",
-                    borderRadius: "14px",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    textAlign: "center",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.background = bgColor;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    if (filter !== status) {
-                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                    }
-                  }}
-                >
-                  <div style={{ fontSize: "11px", color: color, fontWeight: "700", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: "8px" }}>
-                    {status}
-                  </div>
-                  <div style={{ fontSize: "28px", fontWeight: "800", color: "#e8f5e9" }}>{c}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Filter tabs */}
-        {projects.length > 0 && (
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "28px" }} className="fade-up fade-up-2">
-            {FILTERS.map((f) => (
-              <FilterTab
-                key={f}
-                label={f}
-                active={filter === f}
-                onClick={() => setFilter(f)}
-                count={countFor(f)}
-              />
-            ))}
-          </div>
-        )}
 
         {/* 2 Cards per row Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
-          {filtered.length === 0 ? (
+          {projects.length === 0 ? (
             <div style={{ gridColumn: "1 / -1" }}>
               <EmptyState />
             </div>
           ) : (
-            filtered.map((p, i) => {
+            projects.map((p, i) => {
               const { monthlySavings } = calculateMetrics(p.capacityKW);
               
               return (
@@ -378,7 +217,7 @@ export default function ProjectList() {
                     animationDelay: `${i * 0.05}s`,
                     cursor: "pointer",
                   }}
-                  onClick={() => navigate(`/projects/${p._id}`)}
+                  onClick={() => navigate(`/user/project/${p._id}`)}
                 >
                   {/* Header: Icon + Name + Status */}
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
@@ -394,12 +233,11 @@ export default function ProjectList() {
                   </div>
 
                   {/* Stats Grid */}
-                 <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+                  <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
                     <StatBadge label="CAPACITY" value={p.capacityKW} unit="kW" />
-
                     <StatBadge label="MONTHLY SAVINGS" value={formatLKR(monthlySavings)}/>
                     <StatBadge label="TOTAL COST" value={formatLKR(p.cost || 0)}/>
-                 </div>
+                  </div>
 
                   {/* Community info */}
                   {p.communityId && (
@@ -423,7 +261,7 @@ export default function ProjectList() {
                   {/* Funding Progress Bar */}
                   <FundingProgressBar raised={p.totalFunding || 0} target={p.cost || 0} />
 
-                  {/* Simple Action Buttons - Only View and Edit */}
+                  {/* View Details Button */}
                   <div 
                     style={{ 
                       display: "flex", 
@@ -435,7 +273,7 @@ export default function ProjectList() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
-                      onClick={() => navigate(`/projects/${p._id}`)}
+                      onClick={() => navigate(`/user/project/${p._id}`)}
                       style={{
                         flex: 1,
                         padding: "10px",
@@ -458,32 +296,6 @@ export default function ProjectList() {
                       }}
                     >
                       View Details
-                    </button>
-                    
-                    <button
-                      onClick={() => navigate(`/projects/${p._id}/edit`)}
-                      style={{
-                        flex: 1,
-                        padding: "10px",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                        background: "rgba(251,191,36,0.08)",
-                        border: "1px solid rgba(251,191,36,0.2)",
-                        color: "#fcd34d",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "rgba(251,191,36,0.15)";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(251,191,36,0.08)";
-                        e.currentTarget.style.transform = "translateY(0)";
-                      }}
-                    >
-                      Edit Project
                     </button>
                   </div>
                 </div>

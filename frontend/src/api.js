@@ -42,6 +42,8 @@ export async function apiRequest(
 export const projectApi = {
   getAll: () => apiRequest("/api/projects"),
   getOne: (id) => apiRequest(`/api/projects/${id}`),
+  getMyProjects: () => apiRequest("/api/projects/my-projects"),  
+  getByCommunity: (communityId) => apiRequest(`/api/projects/community/${communityId}`),
   create: (data) => apiRequest("/api/projects", { method: "POST", body: data }),
   update: (id, data) => apiRequest(`/api/projects/${id}`, { method: "PUT", body: data }),
   delete: (id) => apiRequest(`/api/projects/${id}`, { method: "DELETE" }),
