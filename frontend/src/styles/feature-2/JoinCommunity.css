@@ -393,6 +393,16 @@
   cursor: not-allowed;
 }
 
+.jc-card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.jc-view-btn {
+  margin-left: auto;
+}
+
 /* modal */
 .jc-modal-backdrop {
   position: fixed;

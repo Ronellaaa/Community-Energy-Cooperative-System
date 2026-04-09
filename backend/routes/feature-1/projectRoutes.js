@@ -11,6 +11,10 @@ import {
 
 const router = express.Router();
 
+//User side routes 
+router.get("/my-projects", requireAuth, controller.getMyProjects);
+router.get("/community/:communityId", controller.getProjectsByCommunity);
+
 // ADMIN ONLY ROUTES
 // Make sure role is "ADMIN" (all caps, as in User model)
 
@@ -21,7 +25,7 @@ router.post("/", requireAuth, requireOfficer, controller.create);
 router.get("/", requireAuth, requireOfficer, controller.getAll);
 
 // Get single project by ID
-router.get("/:id", requireAuth, requireOfficer, controller.getOne);
+router.get("/:id", requireAuth, controller.getOne);
 
 // Update project
 router.put("/:id", requireAuth, requireOfficer, controller.update);
@@ -37,5 +41,7 @@ router.patch("/:id/reject", requireAuth, requireOfficer, controller.reject);
 
 // Activate project
 router.patch("/:id/activate", requireAuth, requireOfficer, controller.activate);
+
+
 
 export default router;

@@ -158,11 +158,12 @@ export default function ProjectDetails() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchProject();
-  }, []);
+  if (id) fetchProject();
+}, [id]);
 
   const fetchProject = async () => {
     try {
+      console.log("ID:", id);
       const data = await projectApi.getOne(id);
       setProject(data);
     } catch (err) {
@@ -361,17 +362,15 @@ export default function ProjectDetails() {
                   onClick={() => handleAction(projectApi.approve, "approve")}
                   disabled={loading}
                 />
+                
               )}
 
-              {/* Reject button - for Pending or Approved projects */}
-              {(project.status === "Pending" || project.status === "Approved") && (
-                <ActionButton
-                  label="✗ Reject Project"
-                  variant="reject"
-                  onClick={() => handleAction(projectApi.reject, "reject")}
-                  disabled={loading}
+              {/*Add payment button*/}
+              <ActionButton
+                  label="Add Payment"
+                  variant="activate"
+                  onClick={() => navigate(`/funding-record/${project._id}`)}
                 />
-              )}
 
               {/* Activate button - only for Approved projects with sufficient funding */}
               {project.status === "Approved" && (

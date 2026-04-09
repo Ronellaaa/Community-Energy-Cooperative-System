@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 const projectSchema = new mongoose.Schema({
   name: { type: String, required: true },
 
-  projectType: {
-    type: String,
-    enum: ["Company", "Community"],
-    required: true,
+ //User
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   },
 
   type: {
@@ -19,12 +19,10 @@ const projectSchema = new mongoose.Schema({
   cost: { type: Number, required: true },
 
   communityId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Community",
-    required: function () {
-      return this.projectType === "Community";
-    },
-  },
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Community",
+  required: true,
+},
 
   expectedMonthlyGeneration: { type: Number, default: 0 },
   expectedMonthlySavings: { type: Number, default: 0 },
@@ -35,5 +33,6 @@ const projectSchema = new mongoose.Schema({
     default: "Pending",
   },
 }, { timestamps: true });
+
 
 export default mongoose.model("Project", projectSchema);

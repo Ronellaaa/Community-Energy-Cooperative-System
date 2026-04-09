@@ -228,7 +228,7 @@ export default function JoinCommunity() {
               </div>
             ) : (
               <div className="jc-status jc-status-muted">
-                You haven’t applied to any community yet.
+                You haven't applied to any community yet.
               </div>
             )}
           </div>
@@ -320,6 +320,12 @@ export default function JoinCommunity() {
                 </div>
 
                 <div className="jc-card-actions">
+                  <button 
+                    className="jc-join"
+                    onClick={() => navigate(`/my-projects/${c._id}`)}
+                  >
+                    View Details
+                  </button>
                   <button
                     className="jc-join"
                     onClick={() => onPick(c)}
