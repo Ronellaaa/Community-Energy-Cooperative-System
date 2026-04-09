@@ -19,7 +19,7 @@ export const createFundingSource = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-};
+}
 
 export const listFundingSources = async (req, res) => {
   try {

@@ -22,7 +22,7 @@ router.get("/community/:communityId", controller.getProjectsByCommunity);
 router.post("/", requireAuth, requireOfficer, controller.create);
 
 // Get all projects
-router.get("/", requireAuth, requireOfficer, controller.getAll);
+router.get("/", requireAuth, controller.getAll);
 
 // Get single project by ID
 router.get("/:id", requireAuth, controller.getOne);

@@ -51,6 +51,7 @@ export default function Login() {
       // backend returns: { token, user }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("role", data.user.role);
 
       goAfterLogin(data.user);
     } catch (err) {
