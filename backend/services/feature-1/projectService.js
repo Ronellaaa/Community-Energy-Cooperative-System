@@ -50,7 +50,10 @@ export const getProjectFunding = async (projectId) => {
 };
 
 export const getProjectById = async (id) => {
-  const project = await Project.findById(id).populate("communityId");
+  const project = await Project.findById(id)
+  .populate("communityId")
+  .populate("createdBy");
+  if (!project) return null;
 
   const totalFunding = await getProjectFunding(project._id);
 

@@ -32,12 +32,23 @@ export const getOne = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    if (project.createdBy.toString() !== req.user._id.toString()) {
+    
+    console.log("PROJECT:", project);
+    console.log("USER:", req.user);
+
+    const creatorId = project.createdBy?._id
+      ? project.createdBy._id.toString()
+      : project.createdBy?.toString();
+    if (
+      req.user.role !== "admin" &&
+      creatorId !== req.user._id.toString()
+    ) {
       return res.status(403).json({ message: "Access denied" });
     }
 
     res.json(project);
   } catch (error) {
+    console.error("GET ONE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 };
