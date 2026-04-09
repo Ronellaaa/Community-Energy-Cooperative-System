@@ -1,4 +1,6 @@
 import JoinRequest from "../../model/JoinRequest.js";
+import Community from "../../model/Community.js"; 
+
 import User from "../../model/User.js";
 
 export const listJoinRequests = async (req, res) => {
@@ -29,17 +31,27 @@ export const listJoinRequests = async (req, res) => {
   res.json({ items, total, page: p, limit: l });
 };
 
+
 export const approveJoinRequest = async (req, res) => {
   const jr = await JoinRequest.findById(req.params.id);
   if (!jr) return res.status(404).json({ message: "Request not found" });
-  if (jr.status !== "PENDING") return res.status(400).json({ message: "Only PENDING can be approved" });
+  if (jr.status !== "PENDING")
+    return res.status(400).json({ message: "Only PENDING can be approved" });
 
   jr.status = "APPROVED";
   jr.reviewedBy = req.user._id;
   jr.reviewedAt = new Date();
   await jr.save();
 
-  await User.findByIdAndUpdate(jr.userId, { communityId: jr.communityId });
+  
+  await User.findByIdAndUpdate(jr.userId, {
+    communityId: jr.communityId,
+  });
+
+  
+  await Community.findByIdAndUpdate(jr.communityId, {
+    $addToSet: { members: jr.userId }, // prevents duplicates
+  });
 
   res.json(jr);
 };

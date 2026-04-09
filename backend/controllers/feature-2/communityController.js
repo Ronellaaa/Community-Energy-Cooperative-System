@@ -1,4 +1,5 @@
 import Community from "../../model/Community.js";
+import Project from "../../model/feature-1/Project.js";
 import User from "../../model/User.js";
 import mongoose from "mongoose";
 export const listCommunities = async (req, res) => {
@@ -15,7 +16,7 @@ export const listCommunities = async (req, res) => {
     ];
   }
 
-  const [items, total, memberCounts] = await Promise.all([
+  const [items, total, memberCounts, projects] = await Promise.all([
     Community.find(q).sort({ createdAt: -1 }).skip(skip).limit(l),
     Community.countDocuments(q),
     User.aggregate([
@@ -33,15 +34,21 @@ export const listCommunities = async (req, res) => {
         },
       },
     ]),
+    Project.find({}, { communityId: 1 }),
   ]);
 
   const memberCountMap = new Map(
     memberCounts.map((entry) => [String(entry._id), entry.memberCount]),
   );
 
+  const projectMap = new Map(
+  projects.map((p) => [String(p.communityId), true])
+  );
+
   const itemsWithCounts = items.map((community) => ({
     ...community.toObject(),
     memberCount: memberCountMap.get(String(community._id)) || 0,
+    hasProject: projectMap.has(String(community._id)),
   }));
 
   res.json({ items: itemsWithCounts, total, page: p, limit: l });

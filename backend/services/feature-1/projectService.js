@@ -1,10 +1,18 @@
 import Project from "../../model/feature-1/Project.js";
 import FundingRecord from "../../model/finance-payments/fundingRecordModel.js";
-import Community from "../../model/Community.js"
+import Community from "../../model/Community.js";
+import mongoose from "mongoose";
 
 import { calculateProjectMetrics } from "../../utils/feature-1/projectCalculator.js";
 
 export const createProject = async (data) => {
+  const existingProject = await Project.findOne({
+      communityId: data.communityId,
+    });
+
+    if (existingProject) {
+      throw new Error("A project already exists for this community");
+    }
   const { projectType, communityId } = data;
 
   if (projectType === "Community") {
@@ -37,7 +45,12 @@ export const getAllProjects = async () => {
 
 export const getProjectFunding = async (projectId) => {
   const result = await FundingRecord.aggregate([
-    { $match: { projectId, status: "RECEIVED" } },
+    {
+      $match: {
+        projectId: new mongoose.Types.ObjectId(projectId), 
+        status: "RECEIVED",
+      },
+    },
     {
       $group: {
         _id: "$projectId",
@@ -90,14 +103,6 @@ export const approveProject = async (id) => {
   return await project.save();
 };
 
-export const rejectProject = async (id) => {
-  const project = await Project.findById(id);
-  if (!project) throw new Error("Project not found");
-
-  project.status = "Rejected";
-  return await project.save();
-};
-
 
 export const activateProject = async (id) => {
   const project = await Project.findById(id);
@@ -108,7 +113,7 @@ export const activateProject = async (id) => {
 
   // Calculate funding from FundingRecord table
   const result = await FundingRecord.aggregate([
-    { $match: { projectId: project._id, status: "RECEIVED" } },
+   { $match: { projectId: new mongoose.Types.ObjectId(project._id), status: "RECEIVED" } },   
     {
       $group: {
         _id: "$projectId",

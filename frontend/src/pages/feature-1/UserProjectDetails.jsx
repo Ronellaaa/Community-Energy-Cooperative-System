@@ -51,7 +51,9 @@ function InfoRow({ label, value }) {
 }
 
 function FundingProgressBar({ raised, target }) {
-  const percentage = Math.min(Math.max((raised / target) * 100, 0), 100);
+  const percentage = target > 0
+  ? Math.min(Math.max((raised / target) * 100, 0), 100)
+  : 0;
   
   return (
     <div style={{ marginTop: "8px", marginBottom: "16px" }}>
@@ -169,8 +171,11 @@ export default function UserProjectDetails() {
 
                 {/* RIGHT SIDE BUTTON */}
                 <button
-                onClick={() => navigate(`/funding-record/${project._id}`)}
-                style={{
+                  onClick={() => {
+                    if (!project?._id) return;
+                    navigate(`/fund-record/${project._id}`);
+                  }}
+                  style={{
                     padding: "10px 18px",
                     background: "rgba(34,197,94,0.15)",
                     border: "1px solid rgba(34,197,94,0.3)",
@@ -178,9 +183,9 @@ export default function UserProjectDetails() {
                     color: "#4ade80",
                     fontWeight: "600",
                     cursor: "pointer",
-                }}
+                  }}
                 >
-                Add Payment
+                  Add Payment
                 </button>
             </div>
             </div>
@@ -200,7 +205,7 @@ export default function UserProjectDetails() {
           {/* Calculate monthly metrics if not provided */}
           <StatCard
             label="Monthly Generation"
-            value={project.expectedMonthlyGeneration || (project.capacityKW * 120)}
+            value={project.expectedMonthlyGeneration || ((project.capacityKW || 0) * 120)}
             unit="kWh"
             accent
           />

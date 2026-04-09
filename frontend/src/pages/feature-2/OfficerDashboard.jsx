@@ -206,9 +206,13 @@ function OfficerCommunitiesSection() {
 
                   <div className="od-card-actions">
                     <button
-                    className="od-btn" type="button" onClick={() =>  navigate(`/projects/create/${c._id}`)} >
-                    + Add Project
-                  </button>
+                      className="od-btn"
+                      type="button"
+                      disabled={c.hasProject}
+                      onClick={() => navigate(`/projects/create/${c._id}`)}
+                    >
+                      {c.hasProject ? "Project Exists" : "+ Add Project"}
+                    </button>
                     <button className="od-btn-approve" type="button" onClick={() => openEditModal(c)} disabled={acting}>
                       Edit
                     </button>

@@ -8,6 +8,7 @@ import EditProjectPage from "./pages/feature-1/EditProject.jsx";
 import BillForm from "./components/BillFormFeature3";
 import UserProjects from "./pages/feature-1/UserProjects.jsx";  
 import UserProjectDetails from "./pages/feature-1/UserProjectDetails.jsx";
+import FundRecordForm from "./pages/finance-payments/forms/FundingRecordForm.jsx";
 import FinanceDashboard from "./pages/finance-payments/Finance-Dashboard.jsx";
 import FinanceEditItemPage from "./pages/finance-payments/Finance-EditItem.jsx";
 import FinanceSourcesPage from "./pages/finance-payments/Finance-Sources.jsx";
@@ -114,6 +115,14 @@ export default function App() {
         <Route path="/admin/officers" element={<AdminOfficers />} />
         {/* <Route path="/funding-record/:projectId" element={<FundingRecord />} /> */}333333333333333333
         
+        <Route
+            path="/fund-record/:id"
+            element={
+              <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
+                <FundRecordForm />
+              </ProtectedRoute>
+            }
+        />
         <Route
           path="/add-bill"
           element={

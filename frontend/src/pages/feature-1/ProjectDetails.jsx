@@ -369,7 +369,7 @@ export default function ProjectDetails() {
               <ActionButton
                   label="Add Payment"
                   variant="activate"
-                  onClick={() => navigate(`/funding-record/${project._id}`)}
+                  onClick={() => navigate(`/fund-record/${project._id}`)}
                 />
 
               {/* Activate button - only for Approved projects with sufficient funding */}

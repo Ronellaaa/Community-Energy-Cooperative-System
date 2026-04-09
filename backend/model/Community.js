@@ -11,6 +11,14 @@ const communitySchema = new mongoose.Schema(
       required: true,
     },
 
+    members: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: []
+    }
+   ],
+
     isArchived: { type: Boolean, default: false },
 
     isApproved: { type: Boolean, default: false },
