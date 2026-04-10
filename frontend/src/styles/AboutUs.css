@@ -1,0 +1,253 @@
+.about-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #071310 0%, #0b1a16 42%, #11241d 100%);
+  color: #fff;
+}
+
+.about-bg {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.about-bg-one {
+  width: 320px;
+  height: 320px;
+  top: 120px;
+  left: -80px;
+  background: rgba(243, 204, 103, 0.22);
+}
+
+.about-bg-two {
+  width: 360px;
+  height: 360px;
+  right: -80px;
+  top: 180px;
+  background: rgba(117, 212, 141, 0.16);
+}
+
+.about-hero {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 58px 40px 48px;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 34px;
+  align-items: center;
+}
+
+.about-copy h1 {
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 0.92;
+  margin-top: 12px;
+}
+
+.about-copy h1 span {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.about-copy p {
+  max-width: 620px;
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.about-kicker {
+  color: #f3cc67;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.about-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.about-metric {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.about-metric strong {
+  display: block;
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.about-metric span {
+  display: block;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.88rem;
+}
+
+.about-visual {
+  position: relative;
+  min-height: 620px;
+}
+
+.about-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.26);
+}
+
+.about-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-card-main {
+  top: 20px;
+  left: 40px;
+  width: 76%;
+  height: 420px;
+}
+
+.about-card-floating {
+  top: 0;
+  right: 0;
+  width: 34%;
+  height: 220px;
+}
+
+.about-card-bottom {
+  bottom: 18px;
+  left: 0;
+  width: 46%;
+  height: 220px;
+}
+
+.about-values {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px 40px 120px;
+}
+
+.about-section-top {
+  max-width: 860px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.about-section-top h2 {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  margin-top: 12px;
+  color: #fff;
+}
+
+.about-section-top p {
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.9;
+  font-size: 0.98rem;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.about-panel {
+  padding: 26px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.about-panel:hover {
+  transform: translateY(-8px);
+  border-color: rgba(243, 204, 103, 0.24);
+}
+
+.about-panel-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.about-panel p {
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.9;
+  font-size: 0.96rem;
+}
+
+@media (max-width: 1080px) {
+  .about-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .about-visual {
+    min-height: 540px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .about-hero,
+  .about-values {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .about-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .about-visual {
+    min-height: 430px;
+  }
+
+  .about-card-main {
+    left: 0;
+    width: 84%;
+    height: 280px;
+  }
+
+  .about-card-floating {
+    width: 38%;
+    height: 150px;
+  }
+
+  .about-card-bottom {
+    width: 52%;
+    height: 150px;
+  }
+}
