@@ -28,6 +28,8 @@ import "./styles/feature-2/auth.css";
 import JoinCommunity from "./pages/feature-2/JoinCommunity";
 import AdminOfficers from "./pages/feature-2/AdminOfficers";
 //import FundingRecord from "./pages/feature-3/FundingRecord.jsx";
+import EnergyHero from "./pages/EnergyHero.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
 
 import "./App.css";
 
@@ -143,6 +145,9 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        
+        <Route path="/home" element={<EnergyHero />} />
+        <Route path="/about" element={<AboutUs />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

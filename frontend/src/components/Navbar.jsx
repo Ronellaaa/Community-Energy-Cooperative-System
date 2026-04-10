@@ -14,6 +14,8 @@ export default function Navbar() {
 
   const role = user?.role || null;
   const links = [
+    { to: "/home", label: "Home" },
+    { to: "/about", label: "About" },
     { to: "/join-community", label: "Communities" },
     { to: "/projects", label: "Projects" },
     { to: "/add-bill", label: "Billing" },
@@ -31,7 +33,7 @@ export default function Navbar() {
         ? "/officer/dashboard"
         : role === "USER"
           ? "/join-community"
-          : "/login";
+          : "/home";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
