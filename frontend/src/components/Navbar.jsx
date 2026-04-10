@@ -17,10 +17,10 @@ export default function Navbar() {
     { to: "/home", label: "Home" },
     { to: "/about", label: "About" },
     { to: "/join-community", label: "Communities" },
-    { to: "/projects", label: "Projects" },
-    { to: "/add-bill", label: "Billing" },
+   
+    
     ...(role === "OFFICER" || role === "ADMIN"
-      ? [{ to: "/officer/dashboard", label: "Officer Panel" }]
+      ? [{ to: "/officer/dashboard", label: "Officer Panel" }, { to: "/projects", label: "Projects" },{ to: "/feature-3/meter-reading", label: "Meter-Reading" },{ to: "/feature-3/admin/community-bills", label: "Billing" }]
       : []),
     ...(role === "ADMIN"
       ? [{ to: "/admin/officers", label: "Admin Panel" }]
