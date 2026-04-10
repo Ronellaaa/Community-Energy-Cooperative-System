@@ -338,45 +338,69 @@ export default function JoinCommunity() {
           <div className="jc-grid">
             {filtered.map((c) => (
               <div className="jc-card" key={c._id}>
-                <div className="jc-card-top">
-                  <div className="jc-avatar">{(c.name || "C")[0]}</div>
-                  <div className="jc-card-meta">
-                    <div className="jc-card-name">{c.name}</div>
-                    <div className="jc-card-loc">{c.location}</div>
-                  </div>
-                </div>
+                {(() => {
+                  const isApprovedCommunity = currentUser?.communityId === c._id;
+                  const disableDetails = isMember && !isApprovedCommunity;
 
-                <div className="jc-card-stats">
-                  <div className="jc-stat-pill">
-                    {c.memberCount || 0} members
-                  </div>
-                </div>
+                  return (
+                    <>
+                      <div className="jc-card-top">
+                        <div className="jc-avatar">{(c.name || "C")[0]}</div>
+                        <div className="jc-card-meta">
+                          <div className="jc-card-name">{c.name}</div>
+                          <div className="jc-card-loc">{c.location}</div>
+                        </div>
+                      </div>
 
-                <div className="jc-card-actions">
-                  <button 
-                    className="jc-join"
-                    onClick={() => navigate(`/my-projects/${c._id}`)}
-                  >
-                    View Details
-                  </button>
-                  <button
-                    className="jc-join"
-                    onClick={() => onPick(c)}
-                    type="button"
-                    disabled={isJoinBlocked}
-                    title={
-                      isMember
-                        ? "You already belong to a community"
-                        : myReq?.status === "PENDING"
-                        ? "You already have a pending request"
-                        : !token
-                          ? "You should login first"
-                          : "Apply to join"
-                    }
-                  >
-                    {isMember ? "Joined" : myReq?.status === "PENDING" ? "Pending…" : "Join"}
-                  </button>
-                </div>
+                      <div className="jc-card-stats">
+                        <div className="jc-stat-pill">
+                          {c.memberCount || 0} members
+                        </div>
+                      </div>
+
+                      <div className="jc-card-actions">
+                        <button
+                          className="jc-join"
+                          onClick={() => navigate(`/my-projects/${c._id}`)}
+                          type="button"
+                          disabled={disableDetails}
+                          title={
+                            disableDetails
+                              ? "Only your approved community can be opened"
+                              : "Open community details"
+                          }
+                        >
+                          View Details
+                        </button>
+                        <button
+                          className="jc-join"
+                          onClick={() => onPick(c)}
+                          type="button"
+                          disabled={isJoinBlocked}
+                          title={
+                            isMember
+                              ? isApprovedCommunity
+                                ? "You already belong to this community"
+                                : "You already belong to another approved community"
+                              : myReq?.status === "PENDING"
+                              ? "You already have a pending request"
+                              : !token
+                                ? "You should login first"
+                                : "Apply to join"
+                          }
+                        >
+                          {isMember
+                            ? isApprovedCommunity
+                              ? "Joined"
+                              : "Unavailable"
+                            : myReq?.status === "PENDING"
+                            ? "Pending…"
+                            : "Join"}
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             ))}
           </div>

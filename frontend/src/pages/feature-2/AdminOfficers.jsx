@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../api";
 import Navbar from "../../components/Navbar";
+import "../../styles/feature-2/officerDashboard.css";
 
 export default function AdminOfficers() {
   const token = localStorage.getItem("token");
@@ -14,6 +15,9 @@ export default function AdminOfficers() {
     phone: "",
     password: "",
   });
+  const activeOfficers = officers.filter((officer) => !officer.isArchived).length;
+  const archivedOfficers = officers.filter((officer) => officer.isArchived).length;
+  const assignedOfficers = officers.filter((officer) => officer.communityId?._id).length;
 
   // simple admin guard
   let user = {};
@@ -75,24 +79,56 @@ export default function AdminOfficers() {
       <Navbar />
       <div className="od-top">
         <div className="od-top-inner">
-          <div>
+          <div className="od-copy">
             <div className="od-kicker">ADMIN PANEL</div>
-            <h1 className="od-title">Officer Management</h1>
+            <h1 className="od-title">Manage officer accounts with less clutter.</h1>
             <p className="od-sub">
-              Create, update, and delete officer accounts.
+              Create new officers, update their details, and keep track of who is currently assigned to a community.
             </p>
           </div>
 
-          <div className="od-actions">
-            <button className="od-btn" onClick={load} disabled={loading}>
-              Refresh
-            </button>
+          <div className="od-side-panel">
+            <div className="od-side-grid">
+              <div className="od-side-stat">
+                <span className="od-side-label">Total officers</span>
+                <strong>{officers.length}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Active</span>
+                <strong>{activeOfficers}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Assigned</span>
+                <strong>{assignedOfficers}</strong>
+              </div>
+            </div>
+
+            <div className="od-actions">
+              <button className="od-btn od-btn-ghost-dark" onClick={load} disabled={loading}>
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="od-wrap">
         {msg ? <div className="msg">{msg}</div> : null}
+
+        <div className="od-stats od-stats-tight">
+          <div className="od-stat">
+            <div className="od-stat-num">{officers.length}</div>
+            <div className="od-stat-lbl">All Officers</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{archivedOfficers}</div>
+            <div className="od-stat-lbl">Archived</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{assignedOfficers}</div>
+            <div className="od-stat-lbl">Assigned Communities</div>
+          </div>
+        </div>
 
         <div className="od-grid" style={{ marginTop: 16 }}>
           {/* Create Officer */}
@@ -107,6 +143,21 @@ export default function AdminOfficers() {
             </div>
 
             <div className="od-info">
+              <div className="od-metric-row">
+                <div className="od-metric">
+                  <span>Role</span>
+                  <strong>Officer</strong>
+                </div>
+                <div className="od-metric">
+                  <span>Status</span>
+                  <strong>New account</strong>
+                </div>
+                <div className="od-metric">
+                  <span>Access</span>
+                  <strong>Admin only</strong>
+                </div>
+              </div>
+
               <form className="form" onSubmit={createOfficer}>
                 <label className="label">Name</label>
                 <input
@@ -271,9 +322,21 @@ function OfficerCard({ officer, token, onChanged }) {
 
         {!edit ? (
           <>
-            <div>
-              <b>Phone:</b> {officer.phone || "—"}
+            <div className="od-metric-row">
+              <div className="od-metric">
+                <span>Status</span>
+                <strong>{officer.isArchived ? "Archived" : "Active"}</strong>
+              </div>
+              <div className="od-metric">
+                <span>Community</span>
+                <strong>{officer.communityId?.name || "Unassigned"}</strong>
+              </div>
+              <div className="od-metric">
+                <span>Phone</span>
+                <strong>{officer.phone || "—"}</strong>
+              </div>
             </div>
+
             <div>
               <b>Community:</b> {officer.communityId?.name || "Not assigned yet"}
             </div>

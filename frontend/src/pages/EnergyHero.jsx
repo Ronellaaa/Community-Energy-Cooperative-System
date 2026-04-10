@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "../styles/EnergyHero.css";
 import hom1Video from "../assets/re2.mp4";
-import community from "../assets/com1.png";
+import community from "../assets/bg2.png";
 import Navbar from "../components/Navbar";
 import solarAsset from "../assets/solar.jpg";
 import hydroAsset from "../assets/hydro.jpg";

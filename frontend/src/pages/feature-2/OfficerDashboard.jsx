@@ -46,6 +46,12 @@ function OfficerCommunitiesSection() {
     const t = data.total || 0;
     return Math.max(1, Math.ceil(t / limit));
   }, [data.total]);
+  const communityCount = data.items?.length || 0;
+  const projectReadyCount = data.items?.filter((item) => item.hasProject).length || 0;
+  const totalMembers = data.items?.reduce(
+    (sum, item) => sum + (item.memberCount || 0),
+    0
+  ) || 0;
 
   const load = async (p = page) => {
     setLoading(true);
@@ -143,29 +149,67 @@ function OfficerCommunitiesSection() {
 
   return (
     <>
-      {/* Header */}
       <div className="od-top">
         <div className="od-top-inner">
-          <div>
+          <div className="od-copy">
             <div className="od-kicker">OFFICER PANEL</div>
-            <h1 className="od-title">Communities</h1>
-            <p className="od-sub">Create, update, and delete communities you manage.</p>
+            <h1 className="od-title">Manage your communities with clarity.</h1>
+            <p className="od-sub">
+              Create communities, update details, and move straight into project setup from one clean dashboard.
+            </p>
           </div>
 
-          <div className="od-actions">
-            <button className="od-btn" onClick={() => setOpenCreate(true)} type="button">
+          <div className="od-side-panel">
+            <div className="od-side-grid">
+              <div className="od-side-stat">
+                <span className="od-side-label">Active communities</span>
+                <strong>{data.total || 0}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Project-ready sites</span>
+                <strong>{projectReadyCount}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Members tracked</span>
+                <strong>{totalMembers}</strong>
+              </div>
+            </div>
+
+            <div className="od-actions">
+              <button className="od-btn" onClick={() => setOpenCreate(true)} type="button">
               + New Community
-            </button>
-            <button className="od-btn" onClick={() => load(page)} disabled={loading} type="button">
-              Refresh
-            </button>
+              </button>
+              <button className="od-btn od-btn-ghost-dark" onClick={() => load(page)} disabled={loading} type="button">
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="od-wrap">
+        <div className="od-stats od-stats-tight">
+          <div className="od-stat">
+            <div className="od-stat-num">{communityCount}</div>
+            <div className="od-stat-lbl">Visible Communities</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{projectReadyCount}</div>
+            <div className="od-stat-lbl">With Projects</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{totalMembers}</div>
+            <div className="od-stat-lbl">Total Members</div>
+          </div>
+        </div>
+
         <div className="od-toolbar">
-          <div style={{ fontWeight: 900 }}>All communities (active)</div>
+          <div className="od-toolbar-copy">
+            <div className="od-toolbar-title">Active communities</div>
+            <div className="od-toolbar-sub">
+              Search, edit, archive, or move directly into project setup.
+            </div>
+          </div>
 
           <div className="od-search">
             <input
@@ -198,6 +242,21 @@ function OfficerCommunitiesSection() {
                 </div>
 
                 <div className="od-info">
+                  <div className="od-metric-row">
+                    <div className="od-metric">
+                      <span>Members</span>
+                      <strong>{c.memberCount || 0}</strong>
+                    </div>
+                    <div className="od-metric">
+                      <span>Project</span>
+                      <strong>{c.hasProject ? "Live" : "Pending"}</strong>
+                    </div>
+                    <div className="od-metric">
+                      <span>Community ID</span>
+                      <strong>{String(c._id).slice(-6).toUpperCase()}</strong>
+                    </div>
+                  </div>
+
                   <div className="od-foot">
                     <span className="od-time">
                       Created: {c.createdAt ? new Date(c.createdAt).toLocaleString() : "—"}
@@ -352,6 +411,11 @@ function OfficerJoinRequestsSection() {
     const t = data.total || 0;
     return Math.max(1, Math.ceil(t / limit));
   }, [data.total]);
+  const visibleRequests = data.items?.length || 0;
+  const documentCount = data.items?.reduce(
+    (sum, item) => sum + (Array.isArray(item.documents) ? item.documents.length : 0),
+    0
+  ) || 0;
 
   const load = async (p = page) => {
     setLoading(true);
@@ -437,27 +501,57 @@ function OfficerJoinRequestsSection() {
 
   return (
     <>
-      {/* top header (clean like the design you shared) */}
       <div className="od-top">
         <div className="od-top-inner">
-          <div>
-            <div className="od-kicker">OFFICER PANEL</div>
-            <h1 className="od-title">Join Requests</h1>
+          <div className="od-copy">
+            <div className="od-kicker">MEMBERSHIP REVIEW</div>
+            <h1 className="od-title">Review join requests faster.</h1>
             <p className="od-sub">
-              Review, approve, or reject membership applications.
+              Check the applicant, review their documents, and approve or reject with less clutter.
             </p>
           </div>
 
-          <div className="od-actions">
-            <button className="od-btn" onClick={() => load(page)} disabled={loading}>
+          <div className="od-side-panel">
+            <div className="od-side-grid">
+              <div className="od-side-stat">
+                <span className="od-side-label">Queue total</span>
+                <strong>{data.total || 0}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Visible requests</span>
+                <strong>{visibleRequests}</strong>
+              </div>
+              <div className="od-side-stat">
+                <span className="od-side-label">Docs attached</span>
+                <strong>{documentCount}</strong>
+              </div>
+            </div>
+
+            <div className="od-actions">
+              <button className="od-btn od-btn-ghost-dark" onClick={() => load(page)} disabled={loading}>
               Refresh
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="od-wrap">
-        {/* toolbar */}
+        <div className="od-stats od-stats-tight">
+          <div className="od-stat">
+            <div className="od-stat-num">{data.total || 0}</div>
+            <div className="od-stat-lbl">Queue Total</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{visibleRequests}</div>
+            <div className="od-stat-lbl">Visible Requests</div>
+          </div>
+          <div className="od-stat">
+            <div className="od-stat-num">{status}</div>
+            <div className="od-stat-lbl">Current Filter</div>
+          </div>
+        </div>
+
         <div className="od-toolbar">
           <div className="od-filters">
             <button
@@ -545,6 +639,21 @@ function OfficerJoinRequestsSection() {
                 </div>
 
                 <div className="od-info">
+                  <div className="od-metric-row">
+                    <div className="od-metric">
+                      <span>Applicant</span>
+                      <strong>{r.applicantType}</strong>
+                    </div>
+                    <div className="od-metric">
+                      <span>Bill range</span>
+                      <strong>{r.monthlyBillRange || "—"}</strong>
+                    </div>
+                    <div className="od-metric">
+                      <span>Docs</span>
+                      <strong>{Array.isArray(r.documents) ? r.documents.length : 0}</strong>
+                    </div>
+                  </div>
+
                   <div><b>Community:</b> {r.communityId?.name || "—"}</div>
                   <div><b>Location:</b> {r.communityId?.location || "—"}</div>
                   <div><b>Phone:</b> {r.phone}</div>
