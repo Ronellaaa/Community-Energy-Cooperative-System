@@ -6,6 +6,7 @@ import upload from '../../middleware/feature-3/upload.js';
 import cloudinary from '../../config/feature-3/cloudinary.js';
 import fs from 'fs';
 import { createBill,getBills,  getBillById, updateBill, deleteBill, getUserBillSummary     } from '../../controllers/feature-3/bill.controller.js';
+import { createPaymentSlip } from '../../controllers/feature-3/payment.slip.controller.js';
 
 
 const router = express.Router();
@@ -20,6 +21,13 @@ router.post('/', upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'file', maxCount: 1 }
 ]), createBill);
+
+router.post('/payment-slips', upload.fields([
+  { name: 'slipImage', maxCount: 1 },
+  { name: 'paymentSlip', maxCount: 1 },
+  { name: 'image', maxCount: 1 },
+  { name: 'file', maxCount: 1 }
+]), createPaymentSlip);
 
 // GET ALL BILLS WITH FILTERING SUPPORT (BY THE CLIENT)
 router.get('/', getBills);

@@ -31,6 +31,8 @@ import fundingSourceRoutes from "./routes/finance-payments/fundingSourceRoute.js
 import creditRoutes from "./routes/feature-3/credit.js";
 import billRoutes from "./routes/feature-3/billRoutes.js";
 import adminBillRoutes from "./routes/feature-3/adminBillRoutes.js";
+import qrRoutes from "./routes/feature-3/qrRoutes.js";
+import meterReadingRoutes from "./routes/feature-3/manager.reading.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,9 +74,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
-startServer();
-
 //project-builder route
 app.use("/api/projects", projectRoutes);
 
@@ -96,6 +95,8 @@ app.use("/api/funding-sources", fundingSourceRoutes);
 app.use("/api/credit", creditRoutes);
 app.use("/api/bills", billRoutes); // Add bill routes
 app.use("/api/admin", adminBillRoutes); // Admin routes
+app.use("/api/qr", qrRoutes);
+app.use("/api", meterReadingRoutes);
 
 app.use(errorHandler);
 
@@ -106,12 +107,6 @@ app.use(errorHandler);
 //     message: err.message || 'Something went wrong!'
 //   });
 // });
-
-
-
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+startServer();
 
 export default app;

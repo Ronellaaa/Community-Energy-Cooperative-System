@@ -1,5 +1,10 @@
 // controllers/adminBillController.js
-import { getAdminBillsByStatus as getAdminBillsByStatusService,  updateBillStatus as updateBillStatusService  } from '../../service/feature-3/admin.bill.service.js';
+import {
+  allocateCommunityBillByConsumption as allocateCommunityBillByConsumptionService,
+  getCommunityBills as getCommunityBillsService,
+  getAdminBillsByStatus as getAdminBillsByStatusService,
+  updateBillStatus as updateBillStatusService
+} from '../../service/feature-3/admin.bill.service.js';
 
 export const getAdminBillsByStatus = async (req, res) => {
   try {
@@ -109,6 +114,116 @@ export const updateBillStatus = async (req, res) => {
     }
     
     res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const allocateCommunityBillByConsumption = async (req, res) => {
+  try {
+    const { communityId, month, year, distributedBy } = req.body;
+
+    const result = await allocateCommunityBillByConsumptionService({
+      communityId,
+      month,
+      year,
+      distributedBy: distributedBy || 'admin'
+    });
+
+    res.json({
+      success: true,
+      message: 'Community bill allocated to members successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error allocating community bill:', error);
+
+    const badRequestMessages = [
+      'communityId is required',
+      'Valid month and year are required',
+      'Community bill not found for the given billing period',
+      'No member consumption records found for the given community and billing period',
+      'Cannot allocate bill because the total units consumed for this period is zero',
+      'Community bill has already been distributed'
+    ];
+
+    const statusCode = badRequestMessages.includes(error.message) ? 400 : 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const getCommunityBills = async (req, res) => {
+  try {
+    const { communityId, month, year, distributionStatus } = req.query;
+
+    if (
+      distributionStatus &&
+      !['pending', 'distributed'].includes(distributionStatus)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid distributionStatus. Must be pending or distributed'
+      });
+    }
+
+    const bills = await getCommunityBillsService({
+      communityId,
+      month,
+      year,
+      distributionStatus
+    });
+
+    res.json({
+      success: true,
+      count: bills.length,
+      data: bills
+    });
+  } catch (error) {
+    console.error('Error fetching community bills:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+export const distributeCommunityBill = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { distributedBy } = req.body;
+
+    const result = await allocateCommunityBillByConsumptionService({
+      billId: id,
+      distributedBy: distributedBy || 'admin'
+    });
+
+    res.json({
+      success: true,
+      message: 'Community bill distributed successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error distributing community bill:', error);
+
+    const badRequestMessages = [
+      'Community bill not found',
+      'No member consumption records found for the given community and billing period',
+      'Cannot allocate bill because the total units consumed for this period is zero',
+      'Community bill has already been distributed'
+    ];
+
+    const statusCode = badRequestMessages.includes(error.message)
+      ? error.message === 'Community bill not found'
+        ? 404
+        : 400
+      : 500;
+
+    res.status(statusCode).json({
       success: false,
       message: error.message
     });

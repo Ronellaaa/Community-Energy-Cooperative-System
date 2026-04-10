@@ -32,13 +32,42 @@ const communityBillSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'paid'],
     default: 'pending'
+  },
+
+  distributionStatus: {
+    type: String,
+    enum: ['pending', 'distributed'],
+    default: 'pending'
+  },
+
+  distributedAt: {
+    type: Date,
+    default: null
+  },
+
+  distributedBy: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
+});
+
+communityBillSchema.pre('validate', function () {
+  const effectiveDistributionStatus = this.distributionStatus || 'pending';
+
+  if (effectiveDistributionStatus !== 'distributed' && this.paymentStatus === 'paid') {
+    this.paymentStatus = 'pending';
+  }
+
+  if (effectiveDistributionStatus !== 'distributed') {
+    this.distributedAt = null;
+    this.distributedBy = null;
+  }
 });
 
 communityBillSchema.index({ communityId: 1, 'billingPeriod.year': -1, 'billingPeriod.month': -1 });
 
 const CommunityBill = mongoose.model('CommunityBill', communityBillSchema);
 
-module.exports = CommunityBill;
+export default CommunityBill;

@@ -43,4 +43,4 @@ const memberConsumptionSchema = new mongoose.Schema({
 
 const MemberConsumption = mongoose.model('MemberConsumption', memberConsumptionSchema);
 
-module.exports = MemberConsumption;
+export default MemberConsumption;

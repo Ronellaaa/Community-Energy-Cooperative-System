@@ -1,0 +1,32 @@
+.qr-scanner-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.qr-scanner-frame {
+  position: relative;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.qr-scanner-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+}
+
+.qr-scanner-cancel-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
