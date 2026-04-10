@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createFundingRecord,
+  getProjectFundingRecords,
   updateFundingRecord,
   deleteFundingRecord,
   getprojectFundingSummary,
@@ -19,6 +20,7 @@ router.get(
   requireAuth,
   getprojectFundingSummary,
 );
+router.get("/project/:projectId", requireAuth, getProjectFundingRecords);
 
 // Update / Delete record by record id
 router.put("/:id", requireAuth, requireOfficer, updateFundingRecord);

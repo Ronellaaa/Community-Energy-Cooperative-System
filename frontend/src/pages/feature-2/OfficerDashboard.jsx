@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../api";
 import Navbar from "../../components/Navbar";
 import "../../styles/feature-2/officerDashboard.css";
@@ -22,6 +23,7 @@ export default function OfficerDashboard() {
 function OfficerCommunitiesSection() {
   const token = localStorage.getItem("token");
 
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const limit = 12;
@@ -203,6 +205,14 @@ function OfficerCommunitiesSection() {
                   </div>
 
                   <div className="od-card-actions">
+                    <button
+                      className="od-btn"
+                      type="button"
+                      disabled={c.hasProject}
+                      onClick={() => navigate(`/projects/create/${c._id}`)}
+                    >
+                      {c.hasProject ? "Project Exists" : "+ Add Project"}
+                    </button>
                     <button className="od-btn-approve" type="button" onClick={() => openEditModal(c)} disabled={acting}>
                       Edit
                     </button>

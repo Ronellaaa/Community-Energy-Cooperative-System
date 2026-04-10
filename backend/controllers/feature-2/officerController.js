@@ -1,4 +1,6 @@
 import JoinRequest from "../../model/JoinRequest.js";
+import Community from "../../model/Community.js"; 
+
 import User from "../../model/User.js";
 import { generateAndUploadQR } from "../../service/feature-3/qrService.js";
 
@@ -35,6 +37,7 @@ export const listJoinRequests = async (req, res) => {
   res.json({ items, total, page: p, limit: l });
 };
 
+
 export const approveJoinRequest = async (req, res) => {
   const jr = await JoinRequest.findById(req.params.id);
   if (!jr) return res.status(404).json({ message: "Request not found" });
@@ -46,7 +49,15 @@ export const approveJoinRequest = async (req, res) => {
   jr.reviewedAt = new Date();
   await jr.save();
 
-  await User.findByIdAndUpdate(jr.userId, { communityId: jr.communityId });
+  
+  await User.findByIdAndUpdate(jr.userId, {
+    communityId: jr.communityId,
+  });
+
+  
+  await Community.findByIdAndUpdate(jr.communityId, {
+    $addToSet: { members: jr.userId }, // prevents duplicates
+  });
 
   // Qr web-hook calling
   let qrGeneration = "success";

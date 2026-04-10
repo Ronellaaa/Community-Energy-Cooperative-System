@@ -1,33 +1,124 @@
+import mongoose from "mongoose";
 import * as projectService from "../../services/feature-1/projectService.js";
+import Project from "../../model/feature-1/Project.js";
+import Community from "../../model/Community.js";
 
 export const create = async (req, res) => {
+    const existingProject = await Project.findOne({
+    communityId: req.body.communityId,
+  });
+
+  if (existingProject) {
+    return res.status(400).json({
+      message: "A project already exists for this community",
+    });
+  }
   try {
-    const project = await projectService.createProject(req.body);
+    const project = await projectService.createProject({...req.body,createdBy: req.user._id,communityId: req.body.communityId, 
+});
     res.status(201).json(project);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+
+
 export const getAll = async (req, res) => {
-  const projects = await projectService.getAllProjects();
-  res.json(projects);
+  try {
+    const projects = await projectService.getAllProjects();
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
 
 export const getOne = async (req, res) => {
-  const project = await projectService.getProjectById(req.params.id);
-  res.json(project);
+  try {
+    const project = await projectService.getProjectById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    
+    console.log("ROLE:", req.user.role);
+    console.log("USER ID:", req.user._id);
+    console.log("CREATOR ID:", project.createdBy);
+
+    const creatorId = project.createdBy?._id?.toString() || project.createdBy?.toString();
+
+      const isAdmin = req.user.role === "ADMIN";
+      const isCreator = creatorId === req.user._id.toString();
+
+// check if user belongs to community
+      const community = await Community.findById(project.communityId);
+
+      if (!community) {
+        return res.status(404).json({ message: "Community not found" });
+      }
+
+      const isMember = community.members?.some(
+        (id) => id.toString() === req.user._id.toString()
+      );
+
+      if (!isAdmin && !isCreator && !isMember) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+    res.json(project);
+  } catch (error) {
+    console.error("GET ONE ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
+export const getMyProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({
+      createdBy: req.user._id
+    }).populate("communityId");
+
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+export const getProjectsByCommunity = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+
+    const projects = await Project.find({
+  communityId: new mongoose.Types.ObjectId(communityId),
+}).populate("communityId");
+
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 export const update = async (req, res) => {
-  const project = await projectService.updateProject(req.params.id, req.body);
-  res.json(project);
+  try {
+    const project = await projectService.updateProject(
+      req.params.id,
+      req.body
+    );
+    res.json(project);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const deleteProject = async (req, res) => {
   try {
     const project = await projectService.deleteProject(req.params.id);
-    res.json({ message: "Deleted successfully", project });
+    res.json({ message: "Deleted successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message }); 
   }
@@ -41,6 +132,7 @@ export const approve = async (req, res) => {
     res.status(400).json({ message: error.message }); 
   }
 };
+
 
 export const activate = async (req, res) => {
   try {

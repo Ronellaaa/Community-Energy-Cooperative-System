@@ -10,7 +10,7 @@ import { requireAuth, requireOfficer } from "../../middleware/auth.js";
 const router = express.Router();
 
 router.post("/", requireAuth, requireOfficer, createFundingSource);
-router.get("/", requireAuth, requireOfficer, listFundingSources);
+router.get("/", requireAuth, listFundingSources);
 router.put("/:id", requireAuth, requireOfficer, updateFundingSource);
 router.delete(
   "/:id",

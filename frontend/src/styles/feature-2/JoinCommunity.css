@@ -43,8 +43,7 @@
 }
 .jc-hero-left {
   border-radius: 28px;
-  background: rgba(248, 223, 154, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+   background: linear-gradient(to right, #a6eb12c7, #00bf73ba, #008793bc, #004d7acc, #051937db); 
   padding: 26px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
@@ -52,25 +51,27 @@
   display: inline-block;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(231, 168, 157, 0.9);
+  background: #013f64;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1px;
+  color: white;
 }
 .jc-title {
   margin: 14px 0 10px;
   font-size: 44px;
   line-height: 0.95;
   font-weight: 900;
+  color: white;
 }
 .jc-accent {
-  background: rgba(167, 201, 87, 0.35);
+  background: #a6eb12b3;
   padding: 2px 10px;
   border-radius: 14px;
 }
 .jc-sub {
   margin: 0 0 14px;
-  color: rgba(58, 46, 42, 0.72);
+  color: rgb(250, 250, 249);
   max-width: 520px;
 }
 .jc-hero-actions {
@@ -157,14 +158,14 @@
   height: 240px;
   left: -80px;
   top: -80px;
-  background: #bbf7d0;
+  background: #004d7a;
 }
 .jc-orb-2 {
   width: 280px;
   height: 280px;
   right: -110px;
   top: 80px;
-  background: #e9d5ff;
+  background: #9efd55;
 }
 
 .jc-illus-card {
@@ -174,15 +175,14 @@
   bottom: 18px;
   top: 18px;
   border-radius: 22px;
-  background: rgba(248, 223, 154, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(to right, #90cb10, #00bf73, #008793bc, #004d7a, #051937);
   overflow: hidden;
 }
 .jc-illus-top {
   display: flex;
   gap: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.738);
 }
 .jc-dot {
   width: 10px;
@@ -211,7 +211,7 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(47, 42, 39, 0.18));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.533), rgba(47, 42, 39, 0.18));
 }
 .jc-illus-line {
   height: 12px;
@@ -274,10 +274,11 @@
   margin: 0;
   font-size: 24px;
   font-weight: 900;
+  color: rgb(244, 241, 241);
 }
 .jc-p {
   margin: 6px 0 0;
-  color: rgba(58, 46, 42, 0.7);
+  color: rgb(244, 241, 241);
   font-size: 13px;
 }
 
@@ -324,7 +325,7 @@
 }
 
 .jc-card {
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(246, 246, 246, 0.651);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 22px;
   padding: 16px;
@@ -340,7 +341,7 @@
   width: 54px;
   height: 54px;
   border-radius: 18px;
-  background: rgba(167, 201, 87, 0.35);
+  background: rgba(179, 255, 1, 0.415);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -353,7 +354,7 @@
 }
 .jc-card-loc {
   font-size: 12px;
-  color: rgba(58, 46, 42, 0.7);
+  color: rgb(58, 46, 42);
   margin-top: 2px;
 }
 
@@ -366,7 +367,7 @@
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(167, 201, 87, 0.2);
+  background: rgba(190, 255, 38, 0.2);
   color: #3a2e2a;
   font-size: 12px;
   font-weight: 800;
@@ -390,6 +391,16 @@
 .jc-join:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.jc-card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.jc-view-btn {
+  margin-left: auto;
 }
 
 /* modal */

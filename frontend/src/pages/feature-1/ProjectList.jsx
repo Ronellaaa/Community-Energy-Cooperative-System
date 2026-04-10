@@ -1,246 +1,497 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Btn, StatusBadge, PageHeader, Card, ErrorMsg, LoadingSpinner, MetricBox, ConfirmModal } from "../../components/feature-1/UI";
 
-const API = "/api/projects"; 
-const getHeaders = () => ({
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
+import { useEffect, useState } from "react";
+import { projectApi } from "../../api";
+import { formatLKR } from "../../utils/feature-1/formatCurrency";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  pageWrapperStyle,
+  glassPanelStyle,
+  PageHeader,
+  focusInputStyle,
+} from "../../components/feature-1/UI";
 
-// Helpers
-const formatLKR = (amount) => {
-  const n = parseFloat(amount) || 0;
-  if (n >= 1_000_000) return `LKR ${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000)     return `LKR ${(n / 1_000).toFixed(0)}k`;
-  return `LKR ${n}`;
+// Calculate metrics helper
+const calculateMetrics = (capacityKW) => {
+  const monthlyGeneration = capacityKW * 120;
+  const monthlySavings = monthlyGeneration * 25;
+  return { monthlyGeneration, monthlySavings };
 };
 
-const getTypeIcon = (type) => {
-  if (type === "Solar") return "☀️";
-  if (type === "Wind")  return "🌬️";
-  if (type === "Hydro") return "💧";
-  return "⚡";
-};
-
-export default function ProjectsListPage() {
-  const navigate = useNavigate();
-  const [projects, setProjects]         = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [error, setError]               = useState("");
-  const [actionError, setActionError]   = useState("");
-  const [filter, setFilter]             = useState("All");
-  const [confirm, setConfirm]           = useState(null);
-
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(API, { headers: getHeaders() });
-      if (!res.ok) throw new Error("Failed to fetch projects");
-      setProjects(await res.json());
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
+function LightStatusBadge({ status }) {
+  const statusConfig = {
+    Pending: { bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)", color: "#fbbf24", dot: "#fbbf24" },
+    Approved: { bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.3)", color: "#4ade80", dot: "#4ade80" },
+    Active: { bg: "rgba(14,165,233,0.12)", border: "rgba(14,165,233,0.3)", color: "#38bdf8", dot: "#38bdf8" },
+    Rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", color: "#f87171", dot: "#f87171" },
   };
 
-  useEffect(() => { fetchProjects(); }, []);
-
-  const handleApprove = async (project) => {
-  try {
-    setActionError("");
-    if ((project.assignedMembers?.length || 0) < 5) {
-      setActionError("Cannot approve: assigned members must be ≥ 5");
-      return;
-    }
-    if (!project.cost || project.cost <= 0) {
-      setActionError("Cannot approve: project cost not defined");
-      return;
-    }
-
-    const res = await fetch(`${API}/${project._id}/approve`, { method: "PATCH", headers: getHeaders() });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
-    fetchProjects();
-  } catch (e) { setActionError(e.message); }
-};
-
-const handleActivate = async (project) => {
-  try {
-    setActionError("");
-    if (project.totalFunding < project.cost) {
-      setActionError("Cannot activate: total funding less than project cost");
-      return;
-    }
-    if (project.status !== "Approved") {
-      setActionError("Cannot activate: project must be approved first");
-      return;
-    }
-
-    const res = await fetch(`${API}/${project._id}/activate`, { method: "PATCH", headers: getHeaders() });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
-    fetchProjects();
-  } catch (e) { setActionError(e.message); }
-};
-
-const handleDelete = async () => {
-  try {
-    const res = await fetch(`${API}/${confirm.id}`, { method: "DELETE", headers: getHeaders() });
-    if (!res.ok) { const e = await res.json(); throw new Error(e.message); }
-    setConfirm(null);
-    fetchProjects();
-  } catch (e) { setActionError(e.message); setConfirm(null); }
-};
-  const filtered     = filter === "All" ? projects : projects.filter(p => p.status === filter);
-  const totalCapacity = projects.reduce((s, p) => s + (p.capacityKW || 0), 0);
-  const totalSavings  = projects.reduce((s, p) => s + (p.expectedMonthlySavings || 0), 0);
-  const activeCount   = projects.filter(p => p.status === "Active").length;
+  const config = statusConfig[status] || statusConfig.Pending;
 
   return (
-    <div style={{ padding: "32px 36px", maxWidth: 1100, margin: "0 auto" }}>
-      <PageHeader
-        breadcrumb="ENERGY PROJECTS"
-        title={<>Energy <span style={{ color: "var(--accent)" }}>Projects</span></>}
-        subtitle="Create, manage and track community energy projects"
-        action={
-          <div style={{ display: "flex", gap: 10 }}>
-            <Btn variant="ghost" onClick={fetchProjects}>↻ Refresh</Btn>
-            <Btn onClick={() => navigate("/projects/create")}>＋ New Project</Btn>
-          </div>
-        }
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        padding: "4px 12px",
+        borderRadius: "20px",
+        fontSize: "11px",
+        fontWeight: "600",
+        letterSpacing: "0.04em",
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.color,
+      }}
+    >
+      <span
+        style={{
+          width: "6px",
+          height: "6px",
+          borderRadius: "50%",
+          background: config.dot,
+          display: "inline-block",
+        }}
       />
+      {status}
+    </span>
+  );
+}
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 28 }}>
-        {[ 
-          { label: "Total Projects",       value: projects.length,        icon: "⚡", top: "var(--accent)" },
-          { label: "Active Projects",      value: activeCount,           icon: "🟢", top: "var(--accent)" },
-          { label: "Total Capacity",       value: `${totalCapacity} kW`, icon: "🔆", top: "var(--accent3)" },
-          { label: "Est. Monthly Savings", value: formatLKR(totalSavings),icon: "💡", top: "var(--accent2)" },
-        ].map((s, i) => (
-          <div key={i} style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "18px 20px", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: s.top }} />
-            <div style={{ position: "absolute", top: 14, right: 14, fontSize: 22, opacity: 0.25 }}>{s.icon}</div>
-            <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>{s.label}</div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 700 }}>{s.value}</div>
-          </div>
-        ))}
+function FundingProgressBar({ raised, target }) {
+  const percentage = Math.min(Math.max((raised / target) * 100, 0), 100);
+  
+  return (
+    <div style={{ marginTop: "12px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+        <span style={{ fontSize: "10px", color: "#6abf7b", fontWeight: "600", letterSpacing: "0.06em" }}>
+          FUNDING PROGRESS
+        </span>
+        <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: "700" }}>
+          {formatLKR(raised)} / {formatLKR(target)}
+        </span>
       </div>
-
-      {actionError && <div style={{ marginBottom: 16 }}><ErrorMsg message={actionError} /></div>}
-
-      {/* Filter tabs */}
-      <div style={{ display: "flex", gap: 4, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 10, padding: 4, width: "fit-content", marginBottom: 22 }}>
-        {["All", "Pending", "Approved", "Active"].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            padding: "7px 18px", borderRadius: 7, fontSize: 13, cursor: "pointer", fontWeight: 500,
-            border: filter === f ? "1px solid rgba(0,229,160,0.25)" : "1px solid transparent",
-            background: filter === f ? "var(--surface)" : "transparent",
-            color: filter === f ? "var(--accent)" : "var(--muted)", transition: "all 0.2s",
-          }}>
-            {f} ({f === "All" ? projects.length : projects.filter(p => p.status === f).length})
-          </button>
-        ))}
+      <div
+        style={{
+          height: "6px",
+          background: "rgba(255,255,255,0.08)",
+          borderRadius: "3px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            width: `${percentage}%`,
+            height: "100%",
+            background: "linear-gradient(90deg, #22c55e, #16a34a)",
+            borderRadius: "3px",
+            transition: "width 0.4s ease",
+          }}
+        />
       </div>
-
-      {loading && <LoadingSpinner text="Fetching projects..." />}
-      {!loading && error && <ErrorMsg message={error} />}
-
-      {!loading && !error && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 18 }}>
-          {filtered.length === 0 && (
-            <div style={{ gridColumn: "span 2", textAlign: "center", padding: 60, color: "var(--muted)", fontSize: 14 }}>
-              No projects found.{" "}
-              <span style={{ color: "var(--accent)", cursor: "pointer" }} onClick={() => navigate("/projects/create")}>
-                Create one →
-              </span>
-            </div>
-          )}
-          {filtered.map((project) => (
-            <ProjectCard
-              key={project._id}
-              project={project}
-              formatLKR={formatLKR}
-              getTypeIcon={getTypeIcon}
-              onView={()     => navigate(`/projects/${project._id}`)}
-              onEdit={()     => navigate(`/projects/${project._id}/edit`)}
-              onApprove={()  => handleApprove(project)}
-              onActivate={() => handleActivate(project)}
-              onDelete={()   => setConfirm({ id: project._id, name: project.name })}
-            />
-          ))}
-        </div>
-      )}
-
-      <ConfirmModal
-        open={!!confirm}
-        title="Delete Project"
-        message={`Are you sure you want to delete "${confirm?.name}"? This cannot be undone.`}
-        confirmLabel="Delete"
-        variant="danger"
-        onConfirm={handleDelete}
-        onCancel={() => setConfirm(null)}
-      />
+      <div style={{ fontSize: "10px", color: "#8aad92", marginTop: "4px" }}>
+        {percentage.toFixed(0)}% funded
+      </div>
     </div>
   );
 }
 
-function ProjectCard({ project, formatLKR, getTypeIcon, onView, onEdit, onApprove, onActivate, onDelete }) {
-  const membersCount = project.assignedMembers?.length || 0;
-  const fundingPct   = project.cost > 0 ? Math.min(100, Math.round((project.totalFunding / project.cost) * 100)) : 0;
+function StatBadge({ label, value, unit }) {
+  return (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        borderRadius: "8px",
+        padding: "8px 12px",
+        textAlign: "center",
+        flex: 1,
+        transition: "all 0.2s ease",
+      }}
+      className="stat-badge"
+    >
+      <div style={{ fontSize: "9px", color: "#6abf7b", fontWeight: "600", letterSpacing: "0.07em", marginBottom: "4px" }}>
+        {label}
+      </div>
+      <div style={{ fontSize: "14px", fontWeight: "700", color: "#e8f5e9" }}>
+        {value} {unit && <span style={{ fontSize: "10px", color: "#6abf7b" }}>{unit}</span>}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div
+      style={{
+        ...glassPanelStyle,
+        padding: "60px 40px",
+        textAlign: "center",
+      }}
+    >
+      <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.4 }}>☀</div>
+      <p style={{ color: "#6abf7b", fontSize: "15px", fontWeight: "600", margin: "0 0 6px" }}>No projects yet</p>
+      <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "13px", margin: 0 }}>
+        Create your first energy project to get started.
+      </p>
+    </div>
+  );
+}
+
+function FilterTab({ label, active, onClick, count }) {
+  const statusColors = {
+    All: { bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
+    Pending: { bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.35)", text: "#fbbf24" },
+    Approved: { bg: "rgba(34,197,94,0.12)", border: "rgba(34,197,94,0.35)", text: "#4ade80" },
+    Rejected: { bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.35)", text: "#f87171" },
+    Active: { bg: "rgba(14,165,233,0.12)", border: "rgba(14,165,233,0.35)", text: "#38bdf8" },
+  };
+
+  const colors = statusColors[label] || statusColors.All;
 
   return (
-    <Card hover>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <div style={{ width: 44, height: 44, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, background: "var(--surface)", border: "1px solid var(--border)" }}>
-            {getTypeIcon(project.type)}
-          </div>
-          <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 700 }}>{project.name}</div>
-            <div style={{ fontSize: 11, color: "var(--muted)", fontFamily: "var(--font-mono)", marginTop: 2 }}>{project.type}</div>
-          </div>
-        </div>
-        <StatusBadge status={project.status} />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "var(--border)", borderRadius: 8, overflow: "hidden", marginBottom: 14 }}>
-        {[
-          { label: "Capacity",   value: `${project.capacityKW} kW`,              color: "var(--text)" },
-          { label: "Cost",       value: formatLKR(project.cost),                  color: "var(--accent2)" },
-          { label: "Savings/mo", value: formatLKR(project.expectedMonthlySavings),color: "var(--accent)" },
-        ].map((m, i) => (
-          <div key={i} style={{ background: "var(--surface)", padding: "12px 10px" }}>
-            <MetricBox {...m} />
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--muted)", marginBottom: 12 }}>
-        <span>⚡ <span style={{ color: "var(--accent3)", fontFamily: "var(--font-mono)" }}>{project.expectedMonthlyGeneration?.toLocaleString()} kWh</span>/mo</span>
-        <span>👥 <span style={{ color: membersCount >= 10 ? "var(--accent)" : "var(--danger)", fontWeight: 600 }}>{membersCount}</span> members
-          {membersCount < 10 && <span style={{ color: "var(--danger)", fontSize: 10, marginLeft: 4 }}>(min 10)</span>}
+    <button
+      onClick={onClick}
+      className="filter-tab"
+      style={{
+        padding: "8px 16px",
+        borderRadius: "20px",
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
+        transition: "all 0.2s ease",
+        background: active ? colors.bg : "rgba(255,255,255,0.04)",
+        border: active ? `1px solid ${colors.border}` : "1px solid rgba(255,255,255,0.08)",
+        color: active ? colors.text : "#8aad92",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+          e.currentTarget.style.transform = "translateY(-1px)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+          e.currentTarget.style.transform = "translateY(0)";
+        }
+      }}
+    >
+      {label}
+      {count != null && (
+        <span
+          style={{
+            fontSize: "11px",
+            padding: "2px 8px",
+            borderRadius: "12px",
+            background: active ? colors.bg : "rgba(255,255,255,0.08)",
+            color: active ? colors.text : "#8aad92",
+          }}
+        >
+          {count}
         </span>
-      </div>
+      )}
+    </button>
+  );
+}
 
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--muted)", marginBottom: 5 }}>
-          <span>Funding</span>
-          <span style={{ color: fundingPct >= 100 ? "var(--accent)" : "var(--accent2)" }}>{fundingPct}%</span>
-        </div>
-        <div style={{ height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
-          <div style={{ height: "100%", borderRadius: 3, width: `${fundingPct}%`, transition: "width 0.6s", background: fundingPct >= 100 ? "linear-gradient(90deg,#00b87a,var(--accent))" : "linear-gradient(90deg,#d47a1a,var(--accent2))" }} />
-        </div>
-      </div>
+const FILTERS = ["All", "Pending", "Approved", "Rejected", "Active"];
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: 14 }}>
-        <Btn variant="ghost" onClick={onView}   style={{ fontSize: 12, padding: "7px 12px" }}>View</Btn>
-        <Btn variant="ghost" onClick={onEdit}   style={{ fontSize: 12, padding: "7px 12px" }}>Edit</Btn>
-        {project.status === "Draft"    && <Btn variant="blue" onClick={onApprove}  style={{ fontSize: 12, padding: "7px 12px"}}>✔ Approve</Btn>}
-        {project.status === "Approved" && <Btn onClick={onActivate} style={{ fontSize: 12, padding: "7px 12px"}}>⚡ Activate</Btn>}
-        {project.status === "Active"   && <span style={{ fontSize: 11, color: "var(--accent)", fontFamily: "var(--font-mono)", display: "flex", alignItems: "center", gap: 4 }}>● RUNNING</span>}
-        <Btn variant="danger" onClick={onDelete} style={{ fontSize: 12, padding: "7px 12px", marginLeft: "auto"}}>Delete</Btn>
+export default function ProjectList() {
+  const [projects, setProjects] = useState([]);
+  const [filter, setFilter] = useState("All");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const data = await projectApi.getAll();
+      setProjects(data);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const filtered = filter === "All"
+    ? projects
+    : projects.filter((p) => p.status === filter);
+
+  const countFor = (s) => s === "All" ? projects.length : projects.filter((p) => p.status === s).length;
+
+  return (
+    <div style={pageWrapperStyle}>
+      <style>{focusInputStyle}</style>
+      <style>{`
+        .project-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .project-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(34, 197, 94, 0.3) !important;
+          background: rgba(255, 255, 255, 0.07) !important;
+          box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.3);
+        }
+        .stat-badge:hover {
+          background: rgba(255, 255, 255, 0.08);
+          transform: translateY(-2px);
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .card-appear {
+          animation: slideUp 0.4s ease forwards;
+        }
+      `}</style>
+
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 24px" }}>
+
+        <PageHeader
+          title="Energy Projects"
+          subtitle={`${projects.length} project${projects.length !== 1 ? "s" : ""} in your portfolio`}
+          action={
+            <Link
+              to="/projects/create/:communityId"
+              className="create-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "11px 20px",
+                background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                border: "none",
+                borderRadius: "10px",
+                color: "#fff",
+                fontWeight: "700",
+                fontSize: "13px",
+                textDecoration: "none",
+                letterSpacing: "0.03em",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 8px 20px rgba(34,197,94,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              + New Project
+            </Link>
+          }
+        />
+
+        {/* Stats row - Light colored status cards */}
+        {projects.length > 0 && (
+          <div
+            style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "28px" }}
+            className="fade-up fade-up-1"
+          >
+            {[
+              { status: "Pending", color: "#fbbf24", bgColor: "rgba(245,158,11,0.12)", borderColor: "rgba(245,158,11,0.3)" },
+              { status: "Approved", color: "#4ade80", bgColor: "rgba(34,197,94,0.12)", borderColor: "rgba(34,197,94,0.3)" },
+              { status: "Active", color: "#38bdf8", bgColor: "rgba(14,165,233,0.12)", borderColor: "rgba(14,165,233,0.3)" },
+              { status: "Rejected", color: "#f87171", bgColor: "rgba(239,68,68,0.12)", borderColor: "rgba(239,68,68,0.3)" },
+            ].map(({ status, color, bgColor, borderColor }) => {
+              const c = countFor(status);
+              return (
+                <div
+                  key={status}
+                  onClick={() => setFilter(filter === status ? "All" : status)}
+                  className="stat-card"
+                  style={{
+                    padding: "16px 20px",
+                    background: filter === status ? bgColor : "rgba(255,255,255,0.04)",
+                    border: filter === status ? `1px solid ${borderColor}` : "1px solid rgba(255,255,255,0.07)",
+                    borderRadius: "14px",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    textAlign: "center",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.background = bgColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    if (filter !== status) {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                    }
+                  }}
+                >
+                  <div style={{ fontSize: "11px", color: color, fontWeight: "700", letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: "8px" }}>
+                    {status}
+                  </div>
+                  <div style={{ fontSize: "28px", fontWeight: "800", color: "#e8f5e9" }}>{c}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Filter tabs */}
+        {projects.length > 0 && (
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "28px" }} className="fade-up fade-up-2">
+            {FILTERS.map((f) => (
+              <FilterTab
+                key={f}
+                label={f}
+                active={filter === f}
+                onClick={() => setFilter(f)}
+                count={countFor(f)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 2 Cards per row Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn: "1 / -1" }}>
+              <EmptyState />
+            </div>
+          ) : (
+            filtered.map((p, i) => {
+              const { monthlySavings } = calculateMetrics(p.capacityKW);
+              
+              return (
+                <div
+                  key={p._id}
+                  className="project-card card-appear"
+                  style={{
+                    ...glassPanelStyle,
+                    padding: "24px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                    animationDelay: `${i * 0.05}s`,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate(`/projects/${p._id}`)}
+                >
+                  {/* Header: Icon + Name + Status */}
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
+                      <span style={{ fontSize: "32px" }}>☀</span>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#e8f5e9", margin: 0, lineHeight: 1.3 }}>
+                          {p.name.length > 35 ? p.name.slice(0, 35) + "..." : p.name}
+                        </h3>
+                      </div>
+                    </div>
+                    <LightStatusBadge status={p.status} />
+                  </div>
+
+                  {/* Stats Grid */}
+                 <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+                    <StatBadge label="CAPACITY" value={p.capacityKW} unit="kW" />
+
+                    <StatBadge label="MONTHLY SAVINGS" value={formatLKR(monthlySavings)}/>
+                    <StatBadge label="TOTAL COST" value={formatLKR(p.cost || 0)}/>
+                 </div>
+
+                  {/* Community info */}
+                  {p.communityId && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "8px 12px",
+                        background: "rgba(14,165,233,0.08)",
+                        borderRadius: "8px",
+                        fontSize: "11px",
+                        color: "#7dd3fc",
+                      }}
+                    >
+                      <span>🏘️</span>
+                      <span style={{ fontWeight: "500" }}>{p.communityId.name}</span>
+                    </div>
+                  )}
+
+                  {/* Funding Progress Bar */}
+                  <FundingProgressBar raised={p.totalFunding || 0} target={p.cost || 0} />
+
+                  {/* Simple Action Buttons - Only View and Edit */}
+                  <div 
+                    style={{ 
+                      display: "flex", 
+                      gap: "10px", 
+                      marginTop: "8px",
+                      paddingTop: "12px",
+                      borderTop: "1px solid rgba(255,255,255,0.06)",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => navigate(`/projects/${p._id}`)}
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        background: "rgba(34,197,94,0.1)",
+                        border: "1px solid rgba(34,197,94,0.3)",
+                        color: "#4ade80",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(34,197,94,0.2)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(34,197,94,0.1)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      View Details
+                    </button>
+                    
+                    <button
+                      onClick={() => navigate(`/projects/${p._id}/edit`)}
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        background: "rgba(251,191,36,0.08)",
+                        border: "1px solid rgba(251,191,36,0.2)",
+                        color: "#fcd34d",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(251,191,36,0.15)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(251,191,36,0.08)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      Edit Project
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 }

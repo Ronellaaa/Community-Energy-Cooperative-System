@@ -11,7 +11,8 @@ export const requireAuth = async (req, res, next) => {
     const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ message: "Invalid token user" });
 
-    req.user = user;
+    req.user = user.toObject();
+    req.user._id = req.user._id.toString();
     next();
   } catch (e) {
     return res.status(401).json({ message: "Unauthorized" });

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiRequest } from "../../api";
 import Navbar from "../../components/Navbar";
 import solarImage from "../../assets/solar.jpg";
-import renewableVideo from "../../assets/renewable.mp4";
+import renewableVideo from "../../assets/re2.mp4";
 import "../../styles/feature-2/JoinCommunity.css";
 
 export default function JoinCommunity() {
@@ -228,7 +228,7 @@ export default function JoinCommunity() {
               </div>
             ) : (
               <div className="jc-status jc-status-muted">
-                You haven’t applied to any community yet.
+                You haven't applied to any community yet.
               </div>
             )}
           </div>
@@ -320,6 +320,12 @@ export default function JoinCommunity() {
                 </div>
 
                 <div className="jc-card-actions">
+                  <button 
+                    className="jc-join"
+                    onClick={() => navigate(`/my-projects/${c._id}`)}
+                  >
+                    View Details
+                  </button>
                   <button
                     className="jc-join"
                     onClick={() => onPick(c)}
