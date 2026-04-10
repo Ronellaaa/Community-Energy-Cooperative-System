@@ -17,6 +17,9 @@ export default function Navbar() {
     { to: "/home", label: "Home" },
     { to: "/about", label: "About" },
     { to: "/join-community", label: "Communities" },
+    ...(role === "USER" && user?.communityId
+      ? [{ to: "/my-community", label: "My Community" }]
+      : []),
    
     
     ...(role === "OFFICER" || role === "ADMIN"

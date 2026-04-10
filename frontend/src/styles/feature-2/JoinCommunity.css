@@ -116,6 +116,15 @@
   font-size: 12px;
   color: rgba(58, 46, 42, 0.7);
 }
+.jc-inline-link {
+  border: none;
+  background: transparent;
+  color: #013f64;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: underline;
+}
 
 .jc-chip {
   font-size: 12px;

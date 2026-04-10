@@ -27,8 +27,8 @@ export default function Login() {
       navigate("/join-community", { replace: true });
       return;
     }
-    // USER in a community -> member dashboard
-    navigate("/member/dashboard", { replace: true });
+    // USER in a community -> member community page
+    navigate("/my-community", { replace: true });
   };
 
   const onSubmit = async (e) => {

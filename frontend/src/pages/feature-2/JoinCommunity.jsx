@@ -9,6 +9,13 @@ import "../../styles/feature-2/JoinCommunity.css";
 export default function JoinCommunity() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  });
 
   const [loading, setLoading] = useState(true);
   const [communities, setCommunities] = useState([]);
@@ -49,6 +56,9 @@ export default function JoinCommunity() {
     );
   }, [communities, search]);
 
+  const isMember = Boolean(currentUser?.communityId);
+  const isJoinBlocked = isMember || myReq?.status === "PENDING";
+
   const load = async () => {
     setLoading(true);
     setMsg("");
@@ -57,14 +67,21 @@ export default function JoinCommunity() {
         `/api/communities?search=${encodeURIComponent(search)}&page=1&limit=50`,
       );
       let myRes = null;
+      let meRes = currentUser;
       if (token) {
-        myRes = await apiRequest("/api/join-requests/me", { token });
+        [myRes, meRes] = await Promise.all([
+          apiRequest("/api/join-requests/me", { token }),
+          apiRequest("/api/auth/me", { token }),
+        ]);
+        localStorage.setItem("user", JSON.stringify(meRes));
+        setCurrentUser(meRes);
       }
 
       // Your backend might return array OR {items:[]}
       const items = Array.isArray(cRes) ? cRes : (cRes.items || []);
       setCommunities(items);
       setMyReq(myRes);
+      if (!token) setCurrentUser(null);
     } catch (e) {
       setMsg(e.message);
     } finally {
@@ -226,6 +243,18 @@ export default function JoinCommunity() {
                   </div>
                 ) : null}
               </div>
+            ) : isMember ? (
+              <div className="jc-status">
+                <div className="jc-status-title">Membership Active</div>
+                <div className="jc-chip jc-chip-approved">APPROVED</div>
+                <button
+                  type="button"
+                  className="jc-inline-link"
+                  onClick={() => navigate("/my-community")}
+                >
+                  Open My Community
+                </button>
+              </div>
             ) : (
               <div className="jc-status jc-status-muted">
                 You haven't applied to any community yet.
@@ -281,7 +310,11 @@ export default function JoinCommunity() {
         <div className="jc-toolbar">
           <div className="jc-toolbar-left">
             <h2 className="jc-h2">Available Communities</h2>
-            <p className="jc-p">Pick one and submit your join request.</p>
+            <p className="jc-p">
+              {isMember
+                ? "You can browse communities, but your membership is already active in your assigned community."
+                : "Pick one and submit your join request."}
+            </p>
           </div>
 
           <div className="jc-search">
@@ -330,16 +363,18 @@ export default function JoinCommunity() {
                     className="jc-join"
                     onClick={() => onPick(c)}
                     type="button"
-                    disabled={myReq?.status === "PENDING"}
+                    disabled={isJoinBlocked}
                     title={
-                      myReq?.status === "PENDING"
+                      isMember
+                        ? "You already belong to a community"
+                        : myReq?.status === "PENDING"
                         ? "You already have a pending request"
                         : !token
                           ? "You should login first"
                           : "Apply to join"
                     }
                   >
-                    {myReq?.status === "PENDING" ? "Pending…" : "Join"}
+                    {isMember ? "Joined" : myReq?.status === "PENDING" ? "Pending…" : "Join"}
                   </button>
                 </div>
               </div>

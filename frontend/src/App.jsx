@@ -28,6 +28,7 @@ import OfficerDashboard from "./pages/feature-2/OfficerDashboard";
 import "./styles/feature-2/auth.css";
 import JoinCommunity from "./pages/feature-2/JoinCommunity";
 import AdminOfficers from "./pages/feature-2/AdminOfficers";
+import MyCommunity from "./pages/feature-2/MyCommunity";
 //import FundingRecord from "./pages/feature-3/FundingRecord.jsx";
 import EnergyHero from "./pages/EnergyHero.jsx";
 import AboutUs from "./pages/AboutUs.jsx";
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/join-community" element={<JoinCommunity />} />
+      <Route path="/my-community" element={<MyCommunity />} />
       <Route path="/officer/dashboard" element={<OfficerDashboard />} />
       <Route path="/admin/officers" element={<AdminOfficers />} /> */}
 
@@ -54,6 +56,14 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/join-community" element={<JoinCommunity />} />
+      <Route
+        path="/my-community"
+        element={
+          <ProtectedRoute allowRoles={["USER"]}>
+            <MyCommunity />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/officer/dashboard" element={<OfficerDashboard />} />
       <Route path="/admin/officers" element={<AdminOfficers />} />
 
