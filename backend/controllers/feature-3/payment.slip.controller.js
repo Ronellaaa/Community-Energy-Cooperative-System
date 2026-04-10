@@ -115,7 +115,11 @@ export const updatePaymentSlipStatus = async (req, res) => {
       "Rejection reason is required when rejecting a payment slip",
     ];
 
-    if (badRequestMessages.includes(error.message)) {
+    if (
+      badRequestMessages.includes(error.message) ||
+      error.message.startsWith("Payment slip amount must match the amount owed exactly") ||
+      error.message.startsWith("Approved payment amount must match the amount owed exactly")
+    ) {
       return res.status(
         error.message === "Payment slip not found" ? 404 : 400,
       ).json({

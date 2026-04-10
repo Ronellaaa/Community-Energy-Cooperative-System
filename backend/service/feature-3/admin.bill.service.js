@@ -3,6 +3,7 @@ import Bill from "../../model/feature-3/Bill.js";
 import Credit from "../../model/feature-3/Credit.js";
 import CommunityBill from "../../model/feature-3/CommunityBill.js";
 import MemberConsumption from "../../model/feature-3/MemberConsumption.js";
+import User from "../../model/User.js";
 import { processCreditUsage } from "../../utils/feature-3/admin.bill.utils.js";
 
 export const getAdminBillsByStatus = async (status, filters = {}) => {
@@ -65,6 +66,27 @@ export const updateBillStatus = async (billId, updateData) => {
 
 const roundToCurrency = (value) => Number(value.toFixed(2));
 
+const getRemainingAmount = (record) =>
+  Math.max(
+    0,
+    roundToCurrency(
+      Number(record?.amountOwed || 0) - Number(record?.paidAmount || 0),
+    ),
+  );
+
+const getCollectionStatus = (record) => {
+  const remainingAmount = getRemainingAmount(record);
+
+  if (remainingAmount <= 0.01) {
+    return "paid";
+  }
+
+  return "unpaid";
+};
+
+const buildBillCollectionKey = (communityId, billingPeriod = {}) =>
+  `${communityId}:${billingPeriod.year}:${billingPeriod.month}`;
+
 const normalizeCommunityBillState = (bill) => {
   const distributionStatus = bill.distributionStatus || "pending";
   const paymentStatus =
@@ -76,6 +98,153 @@ const normalizeCommunityBillState = (bill) => {
     distributedAt: distributionStatus === "distributed" ? bill.distributedAt || null : null,
     distributedBy: distributionStatus === "distributed" ? bill.distributedBy || null : null,
   };
+};
+
+const buildCollectionSummaries = async (bills) => {
+  const distributedBills = bills.filter(
+    (bill) => (bill.distributionStatus || "pending") === "distributed",
+  );
+
+  if (distributedBills.length === 0) {
+    return new Map();
+  }
+
+  const billFilters = [
+    ...new Map(
+      distributedBills.map((bill) => [
+        buildBillCollectionKey(bill.communityId, bill.billingPeriod),
+        {
+          communityId: bill.communityId,
+          "billingPeriod.month": Number(bill.billingPeriod?.month),
+          "billingPeriod.year": Number(bill.billingPeriod?.year),
+        },
+      ]),
+    ).values(),
+  ];
+
+  const consumptionRecords = await MemberConsumption.find({
+    $or: billFilters,
+  })
+    .sort({
+      communityId: 1,
+      "billingPeriod.year": -1,
+      "billingPeriod.month": -1,
+      memberId: 1,
+    })
+    .lean();
+
+  const memberIds = [
+    ...new Set(
+      consumptionRecords
+        .map((record) => String(record.memberId || ""))
+        .filter((memberId) => /^[a-f\d]{24}$/i.test(memberId)),
+    ),
+  ];
+
+  const users = memberIds.length
+    ? await User.find({ _id: { $in: memberIds } }).select("_id name email").lean()
+    : [];
+
+  const userNameMap = new Map(
+    users.map((user) => [String(user._id), user.name || user.email || String(user._id)]),
+  );
+
+  const recordsByBill = new Map();
+
+  consumptionRecords.forEach((record) => {
+    const billKey = buildBillCollectionKey(record.communityId, record.billingPeriod);
+    const memberName = userNameMap.get(String(record.memberId)) || String(record.memberId);
+    const amountOwed = roundToCurrency(Number(record.amountOwed || 0));
+    const amountPaid = roundToCurrency(Number(record.paidAmount || 0));
+    const remainingAmount = getRemainingAmount(record);
+    const collectionStatus = getCollectionStatus(record);
+
+    const memberRecord = {
+      consumptionId: record._id,
+      memberId: String(record.memberId),
+      memberName,
+      unitsConsumed: Number(record.unitsConsumed || 0),
+      amountOwed,
+      amountPaid,
+      remainingAmount,
+      paymentStatus: record.paymentStatus || "pending",
+      collectionStatus,
+    };
+
+    if (!recordsByBill.has(billKey)) {
+      recordsByBill.set(billKey, []);
+    }
+
+    recordsByBill.get(billKey).push(memberRecord);
+  });
+
+  return new Map(
+    distributedBills.map((bill) => {
+      const billKey = buildBillCollectionKey(bill.communityId, bill.billingPeriod);
+      const members = (recordsByBill.get(billKey) || []).sort((left, right) => {
+        const statusOrder = { unpaid: 0, paid: 1 };
+
+        if (statusOrder[left.collectionStatus] !== statusOrder[right.collectionStatus]) {
+          return statusOrder[left.collectionStatus] - statusOrder[right.collectionStatus];
+        }
+
+        if (right.remainingAmount !== left.remainingAmount) {
+          return right.remainingAmount - left.remainingAmount;
+        }
+
+        return left.memberName.localeCompare(right.memberName);
+      });
+
+      const summary = members.reduce(
+        (accumulator, member) => {
+          accumulator.membersCount += 1;
+          accumulator.totalAmountOwed += member.amountOwed;
+          accumulator.totalPaidAmount += member.amountPaid;
+          accumulator.totalRemainingAmount += member.remainingAmount;
+
+          if (member.collectionStatus === "paid") {
+            accumulator.paidMembersCount += 1;
+          } else {
+            accumulator.unpaidMembersCount += 1;
+          }
+
+          return accumulator;
+        },
+        {
+          membersCount: 0,
+          paidMembersCount: 0,
+          unpaidMembersCount: 0,
+          totalAmountOwed: 0,
+          totalPaidAmount: 0,
+          totalRemainingAmount: 0,
+        },
+      );
+
+      const totalAmountOwed = roundToCurrency(summary.totalAmountOwed);
+      const totalPaidAmount = roundToCurrency(summary.totalPaidAmount);
+      const totalRemainingAmount = roundToCurrency(summary.totalRemainingAmount);
+
+      return [
+        bill._id.toString(),
+        {
+          members,
+          summary: {
+            ...summary,
+            totalAmountOwed,
+            totalPaidAmount,
+            totalRemainingAmount,
+            completionPercentage:
+              totalAmountOwed <= 0
+                ? 0
+                : Math.min(
+                    100,
+                    roundToCurrency((totalPaidAmount / totalAmountOwed) * 100),
+                  ),
+          },
+        },
+      ];
+    }),
+  );
 };
 
 export const getCommunityBills = async (filters = {}) => {
@@ -140,12 +309,22 @@ export const getCommunityBills = async (filters = {}) => {
     await CommunityBill.bulkWrite(updates);
   }
 
+  const collectionSummaries = await buildCollectionSummaries(
+    bills.map((bill) => ({
+      ...bill.toObject(),
+      ...normalizeCommunityBillState(bill),
+    })),
+  );
+
   return bills.map((bill) => {
     const normalizedState = normalizeCommunityBillState(bill);
+    const collection = collectionSummaries.get(bill._id.toString()) || null;
 
     return {
       ...bill.toObject(),
       ...normalizedState,
+      collectionSummary: collection?.summary || null,
+      memberCollections: collection?.members || [],
     };
   });
 };

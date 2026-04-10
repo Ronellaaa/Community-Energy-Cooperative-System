@@ -4,6 +4,16 @@ import MemberConsumption from "../../model/feature-3/MemberConsumption.js";
 import PaymentSlip from "../../model/feature-3/PaymentSlip.js";
 import { deleteFromCloudinary, uploadToCloudinary } from "./handleImgService.js";
 
+const roundToCurrency = (value) => Number((Number(value) || 0).toFixed(2));
+
+const getRemainingAmount = (record) =>
+  Math.max(
+    0,
+    roundToCurrency((record?.amountOwed || 0) - (record?.paidAmount || 0)),
+  );
+
+const isConsumptionFullyPaid = (record) => getRemainingAmount(record) <= 0.01;
+
 const ensureObjectId = (value, fieldName) => {
   if (!mongoose.Types.ObjectId.isValid(value)) {
     throw new Error(`${fieldName} is invalid`);
@@ -26,7 +36,7 @@ const syncCommunityBillPaymentStatus = async ({
     return null;
   }
 
-  const allPaid = records.every((record) => record.paymentStatus === "paid");
+  const allPaid = records.every((record) => isConsumptionFullyPaid(record));
 
   const communityBill = await CommunityBill.findOne({
     communityId,
@@ -97,12 +107,21 @@ export const createPaymentSlip = async (paymentSlipData, file) => {
     throw new Error("Member consumption record not found");
   }
 
-  if (memberConsumption.paymentStatus !== "pending") {
-    throw new Error("Payment slip can only be uploaded for pending payments");
+  if (isConsumptionFullyPaid(memberConsumption)) {
+    throw new Error("This payment has already been completed");
   }
 
   if (String(memberConsumption.memberId) !== String(userId)) {
     throw new Error("This payment does not belong to the provided user");
+  }
+
+  const expectedAmount = roundToCurrency(memberConsumption.amountOwed || 0);
+  const submittedAmount = roundToCurrency(amountPaid);
+
+  if (submittedAmount !== expectedAmount) {
+    throw new Error(
+      `Payment slip amount must match the amount owed exactly (${expectedAmount})`,
+    );
   }
 
   const existingActiveSlip = await PaymentSlip.findOne({
@@ -175,6 +194,15 @@ export const updatePaymentSlipStatus = async (paymentSlipId, updateData) => {
   }
 
   if (status === "approved") {
+    const approvedAmount = roundToCurrency(paymentSlip.amountPaid || 0);
+    const expectedAmount = roundToCurrency(memberConsumption.amountOwed || 0);
+
+    if (approvedAmount !== expectedAmount) {
+      throw new Error(
+        `Approved payment amount must match the amount owed exactly (${expectedAmount})`,
+      );
+    }
+
     paymentSlip.status = "approved";
     paymentSlip.rejectionReason = null;
     paymentSlip.reviewedBy = reviewedBy;
@@ -182,7 +210,7 @@ export const updatePaymentSlipStatus = async (paymentSlipId, updateData) => {
     await paymentSlip.save();
 
     memberConsumption.paymentStatus = "paid";
-    memberConsumption.paidAmount = Number(paymentSlip.amountPaid || 0);
+    memberConsumption.paidAmount = approvedAmount;
     await memberConsumption.save();
 
     await syncCommunityBillPaymentStatus({
@@ -192,7 +220,15 @@ export const updatePaymentSlipStatus = async (paymentSlipId, updateData) => {
 
     return {
       message: "Payment slip approved successfully",
-      data: paymentSlip,
+      data: {
+        ...paymentSlip.toObject(),
+        paymentSummary: {
+          amountOwed: expectedAmount,
+          totalPaid: approvedAmount,
+          remainingAmount: 0,
+          paymentStatus: "paid",
+        },
+      },
     };
   }
 
@@ -220,7 +256,15 @@ export const updatePaymentSlipStatus = async (paymentSlipId, updateData) => {
 
     return {
       message: "Payment slip rejected successfully",
-      data: paymentSlip,
+      data: {
+        ...paymentSlip.toObject(),
+        paymentSummary: {
+          amountOwed: roundToCurrency(memberConsumption.amountOwed),
+          totalPaid: 0,
+          remainingAmount: getRemainingAmount(memberConsumption),
+          paymentStatus: "pending",
+        },
+      },
     };
   }
 

@@ -135,6 +135,9 @@
 }
 
 .f3mc-searchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 14px;
   padding: 13px 16px;
@@ -144,6 +147,7 @@
   background: linear-gradient(135deg, #0f766e, #0891b2);
   cursor: pointer;
   box-shadow: 0 12px 28px rgba(8, 145, 178, 0.18);
+  text-decoration: none;
 }
 
 .f3mc-backBtn,
@@ -161,6 +165,13 @@
 .f3mc-searchBtn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+.f3mc-searchBtnDisabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: auto;
   box-shadow: none;
 }
 

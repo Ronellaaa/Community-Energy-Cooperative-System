@@ -1,101 +1,20 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import MeterReadingForm from '../../components/feature-3/MeterReadingForm';
+import { useMeterReadingPage } from '../../hooks/feature-3/useMeterReadingPage';
 import '../../styles/feature-3/meter-reading.css';
 
-const API_BASE_URL = 'http://localhost:5001';
-const now = new Date();
-
 export default function MeterReadingPage() {
-  const [month, setMonth] = useState(String(now.getMonth() + 1));
-  const [year, setYear] = useState(String(now.getFullYear()));
-  const [status, setStatus] = useState({ type: '', message: '' });
-
-  const lookupPreviousReading = useCallback(async ({ memberId, communityId, month, year }) => {
-    const response = await fetch(
-      `${API_BASE_URL}/api/readings/previous/${memberId}/${communityId}/${month}/${year}`
-    );
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || data.error || 'Failed to fetch previous reading');
-    }
-
-    return data.data;
-  }, []);
-
-  const handleSubmit = async (payload) => {
-    setStatus({ type: '', message: '' });
-
-    const response = await fetch(`${API_BASE_URL}/api/readings`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || data.error || 'Failed to submit meter reading');
-    }
-
-    setStatus({
-      type: 'success',
-      message: data.message || 'Meter reading submitted successfully.',
-    });
-
-    return data.data;
-  };
-
-  const handleUpdate = async (id, payload) => {
-    setStatus({ type: '', message: '' });
-
-    const response = await fetch(`${API_BASE_URL}/api/readings/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        previousReading: payload.previousReading,
-        currentReading: payload.currentReading,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || data.error || 'Failed to update meter reading');
-    }
-
-    setStatus({
-      type: 'success',
-      message: data.message || 'Meter reading updated successfully.',
-    });
-
-    return data.data;
-  };
-
-  const handleDelete = async (id) => {
-    setStatus({ type: '', message: '' });
-
-    const response = await fetch(`${API_BASE_URL}/api/readings/${id}`, {
-      method: 'DELETE',
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || data.error || 'Failed to delete meter reading');
-    }
-
-    setStatus({
-      type: 'success',
-      message: data.message || 'Meter reading deleted successfully.',
-    });
-
-    return data.data;
-  };
+  const {
+    month,
+    setMonth,
+    year,
+    setYear,
+    status,
+    lookupPreviousReading,
+    handleSubmit,
+    handleUpdate,
+    handleDelete,
+  } = useMeterReadingPage();
 
   return (
     <div className="f3mr-page">
@@ -177,7 +96,7 @@ export default function MeterReadingPage() {
                 min="1"
                 max="12"
                 value={month}
-                onChange={(e) => setMonth(e.target.value)}
+                onChange={(event) => setMonth(event.target.value)}
               />
             </label>
 
@@ -188,7 +107,7 @@ export default function MeterReadingPage() {
                 type="number"
                 min="2000"
                 value={year}
-                onChange={(e) => setYear(e.target.value)}
+                onChange={(event) => setYear(event.target.value)}
               />
             </label>
           </div>
@@ -212,5 +131,3 @@ export default function MeterReadingPage() {
     </div>
   );
 }
-
-/*http://localhost:5173/feature-3/meter-reading*/

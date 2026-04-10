@@ -1,12 +1,47 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MemberQrViewer from '../../components/feature-3/MemberQrViewer';
+import { fetchCurrentUser } from '../../services/feature-3/currentUserApi';
 import '../../styles/feature-3/meter-reading.css';
 
 export default function MemberQrPage() {
   const [searchParams] = useSearchParams();
-  const memberId = searchParams.get('memberId') || '';
-  const communityId = searchParams.get('communityId') || '';
+  const [sessionIdentity, setSessionIdentity] = React.useState({
+    memberId: '',
+    communityId: '',
+  });
+
+  const memberId = searchParams.get('memberId') || sessionIdentity.memberId || '';
+  const communityId = searchParams.get('communityId') || sessionIdentity.communityId || '';
+
+  React.useEffect(() => {
+    const syncCurrentUser = async () => {
+      try {
+        const currentUser = await fetchCurrentUser();
+
+        if (currentUser.id) {
+          localStorage.setItem("user", JSON.stringify(currentUser));
+        }
+
+        setSessionIdentity({
+          memberId: String(currentUser.memberId || ''),
+          communityId: String(currentUser.communityId || ''),
+        });
+      } catch {
+        try {
+          const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+          setSessionIdentity({
+            memberId: String(storedUser.memberId || storedUser.id || ''),
+            communityId: String(storedUser.communityId || ''),
+          });
+        } catch {
+          setSessionIdentity({ memberId: '', communityId: '' });
+        }
+      }
+    };
+
+    syncCurrentUser();
+  }, []);
 
   return (
     <div className="f3mr-page">

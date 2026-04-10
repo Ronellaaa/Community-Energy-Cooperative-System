@@ -204,6 +204,14 @@
   min-width: 96px;
 }
 
+.f3cb-actionBtnSecondary {
+  min-width: 120px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  box-shadow: none;
+}
+
 .f3cb-actionBtnReject {
   min-width: 96px;
   background: linear-gradient(135deg, #dc2626, #f97316);
@@ -303,6 +311,11 @@
   color: #047857;
 }
 
+.f3cb-pill-unpaid {
+  background: rgba(248, 113, 113, 0.14);
+  color: #b91c1c;
+}
+
 .f3cb-pill-rejected {
   background: rgba(239, 68, 68, 0.12);
   color: #b91c1c;
@@ -326,6 +339,119 @@
   color: #64748b;
 }
 
+.f3cb-expandedCell {
+  padding: 0 !important;
+  background: #f8fbff;
+}
+
+.f3cb-breakdown {
+  padding: 22px;
+  display: grid;
+  gap: 18px;
+}
+
+.f3cb-breakdownHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+  flex-wrap: wrap;
+}
+
+.f3cb-breakdownTitle {
+  margin: 0 0 8px;
+  font-family: "Syne", sans-serif;
+  color: #0f172a;
+}
+
+.f3cb-breakdownText {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.f3cb-statGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+  min-width: min(100%, 420px);
+}
+
+.f3cb-statCard {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.f3cb-statCard span {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.f3cb-statCard strong {
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+.f3cb-breakdownPills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.f3cb-inlineMessage {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.84);
+  color: #475569;
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+}
+
+.f3cb-innerTableWrap {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.f3cb-innerTable {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.f3cb-innerTable th,
+.f3cb-innerTable td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  text-align: left;
+}
+
+.f3cb-innerTable th {
+  background: #dbeafe;
+  color: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.f3cb-memberCell {
+  display: grid;
+  gap: 4px;
+}
+
+.f3cb-memberCell span {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
 @media (max-width: 900px) {
   .f3cb-hero,
   .f3cb-toolbar {
@@ -335,6 +461,10 @@
 
   .f3cb-panel {
     padding: 22px;
+  }
+
+  .f3cb-statGrid {
+    grid-template-columns: 1fr;
   }
 }
 

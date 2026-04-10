@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
-const API_BASE_URL = 'http://localhost:5001';
+import { fetchMemberQrUrl } from '../../services/feature-3/memberQrApi';
 
 export const useMemberQr = ({ memberId, communityId }) => {
   const [qrUrl, setQrUrl] = useState('');
@@ -20,14 +19,7 @@ export const useMemberQr = ({ memberId, communityId }) => {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/qr/${memberId}/${communityId}`);
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || 'Failed to load QR code');
-      }
-
-      setQrUrl(data.data?.qrUrl || '');
+      setQrUrl(await fetchMemberQrUrl({ memberId, communityId }));
     } catch (fetchError) {
       setError(fetchError.message || 'Failed to load QR code');
       setQrUrl('');
