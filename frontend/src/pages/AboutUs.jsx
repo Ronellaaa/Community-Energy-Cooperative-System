@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import "../styles/AboutUs.css";
-import communityImage from "../assets/com1.png";
+import communityImage from "../assets/bg2.png";
 import solarImage from "../assets/solar.jpg";
 import hydroImage from "../assets/hydro.jpg";
 

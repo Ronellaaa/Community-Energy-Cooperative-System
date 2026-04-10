@@ -23,10 +23,10 @@ export default function Navbar() {
    
     
     ...(role === "OFFICER" || role === "ADMIN"
-      ? [{ to: "/officer/dashboard", label: "Officer Panel" }, { to: "/projects", label: "Projects" },{ to: "/feature-3/meter-reading", label: "Meter-Reading" },{ to: "/feature-3/admin/community-bills", label: "Billing" }]
+      ? [{ to: "/officer/dashboard", label: "Officer" }, { to: "/projects", label: "Projects" },{ to: "/feature-3/meter-reading", label: "Meter Reading" },{ to: "/feature-3/admin/community-bills", label: "Billing" }]
       : []),
     ...(role === "ADMIN"
-      ? [{ to: "/admin/officers", label: "Admin Panel" }]
+      ? [{ to: "/admin/officers", label: "Admin" }]
       : []),
   ];
   const homeRoute =
@@ -67,9 +67,9 @@ export default function Navbar() {
           {user ? (
             <>
               <div className="navbar-profile" title={user.email || "Guest"}>
-                <span className="navbar-profile-label">Profile</span>
+                <span className="navbar-profile-label">{role || "Profile"}</span>
                 <span className="navbar-profile-name">
-                  {user.name || user.email}
+                  {user.email || user.name || "Profile"}
                 </span>
               </div>
               <button className="navbar-logout" type="button" onClick={handleLogout}>
