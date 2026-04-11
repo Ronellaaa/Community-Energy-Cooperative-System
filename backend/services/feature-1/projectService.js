@@ -104,6 +104,16 @@ export const approveProject = async (id) => {
 };
 
 
+export const rejectProject = async (id) => {
+  const project = await Project.findById(id);
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+  project.status = "Rejected";
+  return await project.save();
+};
+
 export const activateProject = async (id) => {
   const project = await Project.findById(id);
   if (!project) throw new Error("Project not found");

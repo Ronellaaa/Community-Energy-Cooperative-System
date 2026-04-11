@@ -64,7 +64,7 @@ export const getOne = async (req, res) => {
       );
 
       if (!isAdmin && !isCreator && !isMember) {
-        return res.status(403).json({ message: "Access denied" });
+        return res.status(403).json({ message: "Please log in first" });
       }
 
     res.json(project);
@@ -132,6 +132,16 @@ export const approve = async (req, res) => {
     res.status(400).json({ message: error.message }); 
   }
 };
+
+export const reject = async (req, res) => {
+  try {
+    const project = await projectService.rejectProject(req.params.id);
+    res.json(project);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 
 
 export const activate = async (req, res) => {
