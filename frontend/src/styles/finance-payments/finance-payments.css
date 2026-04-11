@@ -103,6 +103,10 @@
   flex-wrap: wrap;
 }
 
+.fp-toolbar--compact {
+  margin-bottom: 12px;
+}
+
 .fp-button {
   border: none;
   border-radius: 10px;

@@ -61,6 +61,11 @@ export default function FinanceDashboard() {
       <div className="fp-container">
         <div className="fp-header">
           <div>
+            <div className="fp-toolbar fp-toolbar--compact">
+              <Link className="fp-button fp-button--secondary" to="/projects">
+                Back
+              </Link>
+            </div>
             <h1 className="fp-title">Finance & Payments</h1>
             <p className="fp-subtitle">
               Manage fund sources, records, maintenance, and member contributions.
