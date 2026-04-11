@@ -36,6 +36,10 @@ router.delete("/:id", requireAuth, requireOfficer, controller.deleteProject);
 // Approve project
 router.patch("/:id/approve", requireAuth, requireOfficer, controller.approve);
 
+// Reject project
+router.patch("/:id/reject", requireAuth, requireOfficer, controller.reject);
+
+
 // Activate project
 router.patch("/:id/activate", requireAuth, requireOfficer, controller.activate);
 
