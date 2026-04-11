@@ -235,7 +235,7 @@ export default function UserProjectDetails() {
         </button>
 
                 {/* RIGHT SIDE BUTTON */}
-                <button
+                {/* <button
                   onClick={() => {
                     if (!project?._id) return;
                     navigate(`/finance-payments/project/${project._id}`);
@@ -254,13 +254,13 @@ export default function UserProjectDetails() {
                 </button>
             </div>
             </div>
-        {/* Feedback Message */}
+       
         {feedback && (
           <FeedbackMessage
             {...feedback}
             onDismiss={() => setFeedback(null)}
           />
-        )}
+         )} */}
 
         {/* Header card */}
         <div style={{
