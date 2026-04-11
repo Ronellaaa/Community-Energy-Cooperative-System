@@ -3,10 +3,10 @@
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.18), transparent 30%),
-    linear-gradient(180deg, #eef6ff 0%, #f7fbff 55%, #eef4f9 100%);
-  color: #102a43;
+    radial-gradient(circle at top left, rgba(236, 199, 94, 0.18), transparent 22%),
+    radial-gradient(circle at 85% 18%, rgba(79, 163, 118, 0.18), transparent 24%),
+    linear-gradient(180deg, #05120f 0%, #081815 34%, #10231d 100%);
+  color: #ffffff;
 }
 
 .f3mr-shell {
@@ -30,7 +30,7 @@
   height: 280px;
   top: -90px;
   left: -60px;
-  background: rgba(45, 212, 191, 0.22);
+  background: rgba(45, 212, 191, 0.12);
 }
 
 .f3mr-glow-b {
@@ -38,7 +38,7 @@
   height: 340px;
   right: -120px;
   bottom: 40px;
-  background: rgba(37, 99, 235, 0.16);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .f3mr-hero {
@@ -62,10 +62,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.86);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -75,9 +75,9 @@
 }
 
 .f3-backButton:hover {
-  background: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.05);
   border-color: rgba(148, 163, 184, 0.5);
-  color: #334155;
+  color: #eef2ef;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
 }
@@ -97,8 +97,8 @@
 }
 
 .f3mr-card {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
   backdrop-filter: blur(14px);
@@ -119,7 +119,7 @@
   padding: 8px 14px;
   border-radius: 999px;
   background: rgba(15, 118, 110, 0.1);
-  color: #0f766e;
+  color: #8de2a8;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -131,11 +131,11 @@
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.05;
   font-weight: 800;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-titleAccent {
-  color: #0f766e;
+  color: #8de2a8;
 }
 
 .f3mr-subtitle {
@@ -143,7 +143,7 @@
   max-width: 640px;
   font-size: 15px;
   line-height: 1.7;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .f3mr-metrics {
@@ -156,8 +156,8 @@
 .f3mr-metric {
   padding: 16px 18px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.86));
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3mr-metricLabel {
@@ -166,7 +166,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #486581;
+  color: rgba(255, 255, 255, 0.76);
   margin-bottom: 8px;
 }
 
@@ -174,7 +174,7 @@
   display: block;
   font-size: 17px;
   font-weight: 700;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-checklistTitle {
@@ -183,7 +183,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #486581;
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .f3mr-checklist {
@@ -197,7 +197,7 @@
   align-items: flex-start;
   padding: 14px 15px;
   border-radius: 18px;
-  background: rgba(248, 250, 252, 0.9);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(203, 213, 225, 0.7);
 }
 
@@ -209,7 +209,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(15, 118, 110, 0.14);
-  color: #0f766e;
+  color: #8de2a8;
   font-weight: 800;
   flex-shrink: 0;
 }
@@ -218,7 +218,7 @@
   display: block;
   font-size: 14px;
   font-weight: 700;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-checkText {
@@ -226,7 +226,7 @@
   margin-top: 4px;
   font-size: 13px;
   line-height: 1.55;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .f3mr-controlsCard {
@@ -246,13 +246,13 @@
   margin: 0;
   font-size: 20px;
   font-weight: 800;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-sectionNote {
   margin: 0;
   font-size: 13px;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .f3mr-badge {
@@ -260,7 +260,7 @@
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(219, 234, 254, 0.9);
+  background: rgba(255, 255, 255, 0.05);
   color: #1d4ed8;
   font-size: 12px;
   font-weight: 700;
@@ -283,7 +283,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #486581;
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .f3mr-input,
@@ -292,7 +292,7 @@
   width: 100%;
   padding: 14px 15px;
   border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 15px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   box-sizing: border-box;
@@ -300,13 +300,13 @@
 
 .f3mr-input,
 .f3mr-numberInput {
-  background: #ffffff;
-  color: #102a43;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
 }
 
 .f3mr-readonlyInput {
-  background: #f8fafc;
-  color: #486581;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .f3mr-input:focus,
@@ -326,13 +326,13 @@
 }
 
 .f3mr-statusSuccess {
-  background: #ecfdf5;
+  background: rgba(16, 185, 129, 0.1);
   border-color: #86efac;
   color: #166534;
 }
 
 .f3mr-statusError {
-  background: #fff1f2;
+  background: rgba(239, 68, 68, 0.1);
   border-color: #fda4af;
   color: #9f1239;
 }
@@ -349,12 +349,12 @@
   margin: 0 0 8px;
   font-size: 24px;
   font-weight: 800;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-formText {
   margin: 0;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
   line-height: 1.7;
   font-size: 14px;
 }
@@ -373,20 +373,20 @@
 .f3mr-entryCard {
   padding: 20px;
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(255, 255, 255, 0.9));
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3mr-entryTitle {
   margin: 0 0 8px;
   font-size: 18px;
   font-weight: 800;
-  color: #102a43;
+  color: #ffffff;
 }
 
 .f3mr-entryText {
   margin: 0 0 16px;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
   line-height: 1.6;
   font-size: 14px;
 }
@@ -425,7 +425,7 @@
   padding: 18px;
   margin-bottom: 20px;
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(240, 253, 250, 0.94), rgba(236, 253, 245, 0.94));
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(15, 118, 110, 0.16);
 }
 
@@ -454,16 +454,16 @@
   justify-content: center;
   padding: 11px 15px;
   border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: #ffffff;
-  color: #102a43;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
   font-weight: 700;
   cursor: pointer;
 }
 
 .f3mr-dangerButton {
   border-color: rgba(244, 63, 94, 0.25);
-  background: #fff1f2;
+  background: rgba(239, 68, 68, 0.1);
   color: #be123c;
 }
 
@@ -475,11 +475,11 @@
   margin: 9px 0 0;
   font-size: 13px;
   line-height: 1.6;
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .f3mr-helpTextStrong {
-  color: #0f766e;
+  color: #8de2a8;
   font-weight: 700;
 }
 
@@ -490,6 +490,7 @@
   border: none;
   border-radius: 18px;
   background: linear-gradient(135deg, #1d4ed8, #0f766e);
+  color: #fff !important;
   color: #ffffff;
   font-size: 15px;
   font-weight: 800;
@@ -521,8 +522,8 @@
   min-height: 280px;
   overflow: hidden;
   border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .f3mr-errorText {
@@ -543,8 +544,8 @@
   min-height: 340px;
   padding: 18px;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(239, 246, 255, 0.94));
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3mr-qrImage {
@@ -552,13 +553,13 @@
   aspect-ratio: 1 / 1;
   object-fit: contain;
   border-radius: 24px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
   padding: 16px;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
 .f3mr-qrPlaceholder {
-  color: #52667a;
+  color: rgba(255, 255, 255, 0.86);
   font-size: 15px;
   text-align: center;
 }
@@ -589,4 +590,10 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+
+select option {
+  background: #10211D;
+  color: #fff;
 }

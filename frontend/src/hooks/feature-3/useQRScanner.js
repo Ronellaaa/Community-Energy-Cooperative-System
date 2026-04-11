@@ -31,7 +31,6 @@ export const useQRScanner = () => {
 
   const handleError = (err) => {
     const message = String(err || '');
-    console.error('QR Scan Error:', err);
 
     // html5-qrcode may emit frequent decode errors while the camera is working.
     // We only surface likely camera/setup failures and keep the scanner open.

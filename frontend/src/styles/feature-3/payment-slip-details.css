@@ -14,7 +14,7 @@
   display: inline-flex;
   border-radius: 999px;
   background: rgba(14, 116, 144, 0.1);
-  color: #0f766e;
+  color: #8de2a8;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -27,12 +27,12 @@
   font-family: "Syne", sans-serif;
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.05;
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .f3psd-subtitle {
   margin: 0;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.86);
   line-height: 1.7;
 }
 
@@ -42,8 +42,8 @@
   padding: 11px 14px;
   font: inherit;
   font-weight: 700;
-  color: #0f172a;
-  background: #fff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
 }
 
@@ -57,8 +57,9 @@
   padding: 24px;
   color: #eff6ff;
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 28%),
-    linear-gradient(135deg, #0f766e, #1d4ed8);
+    radial-gradient(circle at top left, rgba(236, 199, 94, 0.18), transparent 22%),
+    radial-gradient(circle at 85% 18%, rgba(79, 163, 118, 0.18), transparent 24%),
+    linear-gradient(180deg, #05120f 0%, #081815 34%, #10231d 100%);
   box-shadow: 0 24px 50px rgba(29, 78, 216, 0.18);
 }
 
@@ -109,7 +110,7 @@
   gap: 6px;
   padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -137,8 +138,8 @@
   gap: 14px;
   border-radius: 22px;
   padding: 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.92));
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3psd-item {
@@ -147,7 +148,7 @@
 }
 
 .f3psd-item span {
-  color: #475569;
+  color: rgba(255, 255, 255, 0.86);
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -155,7 +156,7 @@
 }
 
 .f3psd-item strong {
-  color: #0f172a;
+  color: #ffffff;
   font-size: 1rem;
   line-height: 1.7;
 }
@@ -177,17 +178,17 @@
 
 .f3psd-pill-pending {
   background: rgba(250, 204, 21, 0.18);
-  color: #a16207;
+  color: #fde047;
 }
 
 .f3psd-pill-approved {
   background: rgba(16, 185, 129, 0.16);
-  color: #047857;
+  color: #6ee7b7;
 }
 
 .f3psd-pill-rejected {
   background: rgba(239, 68, 68, 0.14);
-  color: #b91c1c;
+  color: #fca5a5;
 }
 
 .f3psd-previewCard {
@@ -195,8 +196,8 @@
   gap: 18px;
   border-radius: 26px;
   padding: 22px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
 }
 
@@ -208,14 +209,14 @@
 }
 
 .f3psd-previewEyebrow {
-  color: #0f766e;
+  color: #8de2a8;
 }
 
 .f3psd-previewTitle {
   margin: 6px 0 0;
   font-family: "Syne", sans-serif;
   font-size: 1.6rem;
-  color: #0f172a;
+  color: #ffffff;
 }
 
 .f3psd-linkBtn {
@@ -226,7 +227,7 @@
   padding: 10px 16px;
   text-decoration: none;
   font-weight: 700;
-  color: #0f766e;
+  color: #8de2a8;
   background: rgba(15, 118, 110, 0.08);
   border: 1px solid rgba(15, 118, 110, 0.14);
 }
@@ -240,7 +241,7 @@
   border-radius: 22px;
   padding: 14px;
   background: linear-gradient(180deg, rgba(226, 232, 240, 0.7), rgba(248, 250, 252, 0.95));
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3psd-image {
@@ -249,7 +250,7 @@
   max-height: 640px;
   object-fit: contain;
   border-radius: 14px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .f3psd-documentCard {
@@ -261,7 +262,7 @@
   border-radius: 22px;
   padding: 24px;
   background: linear-gradient(180deg, rgba(226, 232, 240, 0.7), rgba(248, 250, 252, 0.95));
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .f3psd-documentIcon {
@@ -275,13 +276,14 @@
   font-size: 1.4rem;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #0f766e, #0ea5a4);
+  background: linear-gradient(135deg, #f7d774, #d7b24a 62%, #b7902d);
+  color: #10211D !important;
 }
 
 .f3psd-documentText {
   max-width: 460px;
   margin: 0;
-  color: #475569;
+  color: rgba(255, 255, 255, 0.86);
   line-height: 1.7;
 }
 
@@ -297,4 +299,10 @@
   .f3psd-card {
     grid-template-columns: 1fr;
   }
+}
+
+
+select option {
+  background: #10211D;
+  color: #fff;
 }

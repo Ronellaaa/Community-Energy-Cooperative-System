@@ -112,9 +112,9 @@ const buildCollectionSummaries = async (bills) => {
   const billFilters = [
     ...new Map(
       distributedBills.map((bill) => [
-        buildBillCollectionKey(bill.communityId, bill.billingPeriod),
+        buildBillCollectionKey(bill.communityId?.trim() || bill.communityId, bill.billingPeriod),
         {
-          communityId: bill.communityId,
+          communityId: bill.communityId?.trim() || bill.communityId,
           "billingPeriod.month": Number(bill.billingPeriod?.month),
           "billingPeriod.year": Number(bill.billingPeriod?.year),
         },
@@ -180,7 +180,7 @@ const buildCollectionSummaries = async (bills) => {
 
   return new Map(
     distributedBills.map((bill) => {
-      const billKey = buildBillCollectionKey(bill.communityId, bill.billingPeriod);
+      const billKey = buildBillCollectionKey(bill.communityId?.trim() || bill.communityId, bill.billingPeriod);
       const members = (recordsByBill.get(billKey) || []).sort((left, right) => {
         const statusOrder = { unpaid: 0, paid: 1 };
 
@@ -458,7 +458,7 @@ export const allocateCommunityBillByConsumption = async ({
   const numericYear = Number(communityBill.billingPeriod.year);
 
   const consumptions = await MemberConsumption.find({
-    communityId: communityBill.communityId,
+    communityId: communityBill.communityId?.trim() || communityBill.communityId,
     "billingPeriod.month": numericMonth,
     "billingPeriod.year": numericYear,
   }).sort({ unitsConsumed: -1, memberId: 1 });
