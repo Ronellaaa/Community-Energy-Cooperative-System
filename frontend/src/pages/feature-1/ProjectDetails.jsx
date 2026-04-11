@@ -14,7 +14,6 @@ const odPageStyle = {
                linear-gradient(180deg, #081713 0%, #102720 42%, #122017 100%)`,
   fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
 };
-const [financeSummary, setFinanceSummary] = useState(null);
 
 function StatusBadge({ status }) {
   const cfg = {
@@ -339,6 +338,8 @@ export default function ProjectDetails() {
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [actionLoading, setActionLoading] = useState({});
+  const [financeSummary, setFinanceSummary] = useState(null);
+
 
   useEffect(() => {
     if (id) fetchProject();

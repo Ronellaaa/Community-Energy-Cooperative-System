@@ -399,7 +399,10 @@ export default function ProjectPaymentsPage() {
             <p className="fp-subtitle">Funding, member contribution, and maintenance details for this project.</p>
           </div>
           <div className="fp-toolbar">
-            <Link className="fp-button fp-button--secondary" to="/finance-payments/dashboard">
+            <Link
+              className="fp-button fp-button--secondary"
+              to={managerView ? "/finance-payments/dashboard" : `/user/project/${projectId}`}
+            >
               Back
             </Link>
             <StatusBadge text={getProjectStatusLabel(bundle?.project, bundle?.summary)} />

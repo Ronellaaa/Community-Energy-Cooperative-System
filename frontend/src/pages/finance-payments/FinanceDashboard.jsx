@@ -4,22 +4,17 @@ import FinanceCard from "../../components/finance-payments/FinanceCard";
 import StatusBadge from "../../components/finance-payments/StatusBadge";
 import FinancePagination from "../../components/finance-payments/FinancePagination";
 import {
-  getStoredFinanceUser,
-  isFinanceManager,
   loadFinanceProjects,
   loadProjectFinanceBundle,
   paginateItems,
 } from "./services/financeModuleApi";
 import {
-  filterProjectsForUser,
   formatCurrency,
   getProjectStatusLabel,
 } from "./utils/financeModuleUtils";
 import "../../styles/finance-payments/finance-payments.css";
 
 export default function FinanceDashboard() {
-  const user = getStoredFinanceUser();
-  const managerView = isFinanceManager(user?.role);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,14 +31,10 @@ export default function FinanceDashboard() {
         const allProjects = await loadFinanceProjects();
         if (ignore) return;
 
-        const visibleProjects = managerView
-          ? allProjects
-          : filterProjectsForUser(allProjects, user?.id);
+        setProjects(allProjects);
 
-        setProjects(visibleProjects);
-
-        if (visibleProjects[0]?._id) {
-          const bundle = await loadProjectFinanceBundle(visibleProjects[0]._id);
+        if (allProjects[0]?._id) {
+          const bundle = await loadProjectFinanceBundle(allProjects[0]._id);
           if (!ignore) {
             setFirstProjectSummary(bundle.summary);
           }
@@ -61,7 +52,7 @@ export default function FinanceDashboard() {
     return () => {
       ignore = true;
     };
-  }, [managerView, user?.id]);
+  }, []);
 
   const paginated = useMemo(() => paginateItems(projects, page, 6), [page, projects]);
 
@@ -72,23 +63,15 @@ export default function FinanceDashboard() {
           <div>
             <h1 className="fp-title">Finance & Payments</h1>
             <p className="fp-subtitle">
-              {managerView
-                ? "Manage fund sources, records, maintenance, and member contributions."
-                : "View project payment details and your own member contributions."}
+              Manage fund sources, records, maintenance, and member contributions.
             </p>
           </div>
-          {managerView ? (
-            <div className="fp-toolbar">
-              <Link className="fp-button" to="/finance-payments/fund-sources">Fund Sources</Link>
-              <Link className="fp-button" to="/finance-payments/fund-records">Fund Records</Link>
-              <Link className="fp-button" to="/finance-payments/member-contributions">Member Contributions</Link>
-              <Link className="fp-button" to="/finance-payments/maintenance">Maintenance</Link>
-            </div>
-          ) : (
-            <div className="fp-toolbar">
-              <Link className="fp-button" to="/finance-payments/user-payments">My Payments</Link>
-            </div>
-          )}
+          <div className="fp-toolbar">
+            <Link className="fp-button" to="/finance-payments/fund-sources">Fund Sources</Link>
+            <Link className="fp-button" to="/finance-payments/fund-records">Fund Records</Link>
+            <Link className="fp-button" to="/finance-payments/member-contributions">Member Contributions</Link>
+            <Link className="fp-button" to="/finance-payments/maintenance">Maintenance</Link>
+          </div>
         </div>
 
         {loading ? <div className="fp-message fp-message--loading">Loading finance data...</div> : null}
@@ -96,30 +79,28 @@ export default function FinanceDashboard() {
 
         {!loading && !error ? (
           <>
-            {managerView ? (
-              <div className="fp-kpi-grid">
-                <div className="fp-kpi">
-                  <div className="fp-kpi__label">Projects</div>
-                  <div className="fp-kpi__value">{projects.length}</div>
-                </div>
-                <div className="fp-kpi">
-                  <div className="fp-kpi__label">Project Cost</div>
-                  <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.projectCost)}</div>
-                </div>
-                <div className="fp-kpi">
-                  <div className="fp-kpi__label">Available For Installation</div>
-                  <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.availableForInstallation)}</div>
-                </div>
-                <div className="fp-kpi">
-                  <div className="fp-kpi__label">Maintenance Balance</div>
-                  <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.maintenanceFundBalance)}</div>
-                </div>
+            <div className="fp-kpi-grid">
+              <div className="fp-kpi">
+                <div className="fp-kpi__label">Projects</div>
+                <div className="fp-kpi__value">{projects.length}</div>
               </div>
-            ) : null}
+              <div className="fp-kpi">
+                <div className="fp-kpi__label">Project Cost</div>
+                <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.projectCost)}</div>
+              </div>
+              <div className="fp-kpi">
+                <div className="fp-kpi__label">Available For Installation</div>
+                <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.availableForInstallation)}</div>
+              </div>
+              <div className="fp-kpi">
+                <div className="fp-kpi__label">Maintenance Balance</div>
+                <div className="fp-kpi__value">{formatCurrency(firstProjectSummary?.maintenanceFundBalance)}</div>
+              </div>
+            </div>
 
             <FinanceCard
-              title={managerView ? "Projects" : "My Project Payments"}
-              subtitle={managerView ? "Open a project to view finance details." : "Projects assigned to you with payment details."}
+              title="Projects"
+              subtitle="Open a project to view finance details."
             >
               {!paginated.items.length ? (
                 <div className="fp-empty">No projects available.</div>

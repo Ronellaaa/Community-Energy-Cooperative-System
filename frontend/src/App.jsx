@@ -19,7 +19,6 @@ import FundRecordPage from "./pages/finance-payments/FundRecordPage.jsx";
 import MaintenancePage from "./pages/finance-payments/MaintenancePage.jsx";
 import MemberContributionPage from "./pages/finance-payments/MemberContributionPage.jsx";
 import ProjectPaymentsPage from "./pages/finance-payments/ProjectPaymentsPage.jsx";
-import UserPaymentDetailsPage from "./pages/finance-payments/UserPaymentDetailsPage.jsx";
 
 import Login from "./pages/feature-2/Login";
 import Register from "./pages/feature-2/Register";
@@ -106,7 +105,7 @@ export default function App() {
       <Route
         path="/finance-payments/dashboard"
         element={
-          <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
+          <ProtectedRoute allowRoles={["OFFICER", "ADMIN"]}>
             <FinanceDashboard />
           </ProtectedRoute>
         }
@@ -116,14 +115,6 @@ export default function App() {
         element={
           <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
             <ProjectPaymentsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/finance-payments/user-payments"
-        element={
-          <ProtectedRoute allowRoles={["USER"]}>
-            <UserPaymentDetailsPage />
           </ProtectedRoute>
         }
       />
