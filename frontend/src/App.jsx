@@ -13,14 +13,13 @@ import MemberConsumptionPage from "./pages/feature-3/MemberConsumptionPage.jsx";
 import BillForm from "./components/BillFormFeature3";
 import UserProjects from "./pages/feature-1/UserProjects.jsx";
 import UserProjectDetails from "./pages/feature-1/UserProjectDetails.jsx";
-import FundRecordForm from "./pages/finance-payments/forms/FundingRecordForm.jsx";
-import FinanceDashboard from "./pages/finance-payments/Finance-Dashboard.jsx";
-import FinanceEditItemPage from "./pages/finance-payments/Finance-EditItem.jsx";
-import FinanceSourcesPage from "./pages/finance-payments/Finance-Sources.jsx";
-import CommunityProjectsPage from "./pages/finance-payments/CommunityProjectsPage.jsx";
-import ProjectDetailsPage from "./pages/finance-payments/ProjectDetailsPage.jsx";
-import MyPaymentsPage from "./pages/finance-payments/MyPaymentsPage.jsx";
-import OfficerProjectReviewPage from "./pages/finance-payments/OfficerProjectReviewPage.jsx";
+import FinanceDashboard from "./pages/finance-payments/FinanceDashboard.jsx";
+import FundSourcePage from "./pages/finance-payments/FundSourcePage.jsx";
+import FundRecordPage from "./pages/finance-payments/FundRecordPage.jsx";
+import MaintenancePage from "./pages/finance-payments/MaintenancePage.jsx";
+import MemberContributionPage from "./pages/finance-payments/MemberContributionPage.jsx";
+import ProjectPaymentsPage from "./pages/finance-payments/ProjectPaymentsPage.jsx";
+import UserPaymentDetailsPage from "./pages/finance-payments/UserPaymentDetailsPage.jsx";
 
 import Login from "./pages/feature-2/Login";
 import Register from "./pages/feature-2/Register";
@@ -52,7 +51,7 @@ export default function App() {
 
       <Route path="/home" element={<EnergyHero />} />
       <Route path="/about" element={<AboutUs />} />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/join-community" element={<JoinCommunity />} />
@@ -113,72 +112,56 @@ export default function App() {
         }
       />
       <Route
-        path="/finance-payments/dashboard/:projectId"
-        element={
-          <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
-            <FinanceDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/finance-payments/community-projects"
-        element={
-          <ProtectedRoute allowRoles={["USER"]}>
-            <CommunityProjectsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
         path="/finance-payments/project/:projectId"
         element={
           <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
-            <ProjectDetailsPage />
+            <ProjectPaymentsPage />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/finance-payments/my-payments"
+        path="/finance-payments/user-payments"
         element={
           <ProtectedRoute allowRoles={["USER"]}>
-            <MyPaymentsPage />
+            <UserPaymentDetailsPage />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/finance-payments/officer-review"
+        path="/finance-payments/fund-sources"
         element={
           <ProtectedRoute allowRoles={["OFFICER", "ADMIN"]}>
-            <OfficerProjectReviewPage />
+            <FundSourcePage />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/finance-payments/sources/:projectId"
+        path="/finance-payments/fund-records"
         element={
           <ProtectedRoute allowRoles={["OFFICER", "ADMIN"]}>
-            <FinanceSourcesPage />
+            <FundRecordPage />
           </ProtectedRoute>
         }
       />
       <Route
-        path="/finance-payments/edit/:entity/:projectId/:id"
+        path="/finance-payments/maintenance"
         element={
           <ProtectedRoute allowRoles={["OFFICER", "ADMIN"]}>
-            <FinanceEditItemPage />
+            <MaintenancePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance-payments/member-contributions"
+        element={
+          <ProtectedRoute allowRoles={["OFFICER", "ADMIN"]}>
+            <MemberContributionPage />
           </ProtectedRoute>
         }
       />
 
       {/* <Route path="/funding-record/:projectId" element={<FundingRecord />} /> */}
 
-      <Route
-        path="/fund-record/:id"
-        element={
-          <ProtectedRoute allowRoles={["USER", "OFFICER", "ADMIN"]}>
-            <FundRecordForm />
-          </ProtectedRoute>
-        }
-      />
       {/* <Route
           path="/add-bill"
           element={

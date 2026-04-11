@@ -173,7 +173,7 @@ export default function UserProjectDetails() {
                 <button
                   onClick={() => {
                     if (!project?._id) return;
-                    navigate(`/fund-record/${project._id}`);
+                    navigate(`/finance-payments/project/${project._id}`);
                   }}
                   style={{
                     padding: "10px 18px",
