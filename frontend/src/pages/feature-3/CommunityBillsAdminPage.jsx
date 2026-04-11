@@ -1,7 +1,10 @@
 import React from "react";
+import AdminPaymentSlipDetailsDialog from "../../components/feature-3/AdminPaymentSlipDetailsDialog";
+import BackButton from "../../components/feature-3/BackButton";
 import CommunityBillsSummaryPanel from "../../components/feature-3/CommunityBillsSummaryPanel";
 import CommunityBillsTable from "../../components/feature-3/CommunityBillsTable";
 import PaymentSlipsTable from "../../components/feature-3/PaymentSlipsTable";
+import PaymentSlipRejectionDialog from "../../components/feature-3/PaymentSlipRejectionDialog";
 import { useCommunityBillsAdmin } from "../../hooks/feature-3/useCommunityBillsAdmin";
 import "../../styles/feature-3/community-bills.css";
 
@@ -28,23 +31,18 @@ export default function CommunityBillsAdminPage() {
     handlePaymentSlipFilterChange,
     handleDistribute,
     handlePaymentSlipStatusUpdate,
+    selectedPaymentSlip,
+    isSlipDetailsOpen,
+    detailsLoading,
+    detailsError,
+    openPaymentSlipDetails,
+    closePaymentSlipDetails,
+    rejectDialogState,
+    openRejectDialog,
+    closeRejectDialog,
+    setRejectReason,
+    submitRejectDialog,
   } = useCommunityBillsAdmin();
-
-  const handleRejectSlip = (paymentSlipId) => {
-    const rejectionReason = window.prompt(
-      "Enter a rejection reason for this payment slip:",
-    );
-
-    if (!rejectionReason?.trim()) {
-      return;
-    }
-
-    handlePaymentSlipStatusUpdate({
-      paymentSlipId,
-      status: "rejected",
-      rejectionReason,
-    });
-  };
 
   return (
     <div className="f3cb-page">
@@ -54,13 +52,18 @@ export default function CommunityBillsAdminPage() {
       <div className="f3cb-shell">
         <section className="f3cb-hero">
           <div className="f3cb-panel f3cb-heroPanel">
-            <span className="f3cb-kicker">Admin</span>
-            <h1 className="f3cb-title">Community Bills And Payment Slips</h1>
-            <p className="f3cb-subtitle">
-              Distribute community electricity bills, then use payment slips to
-              track how much has been collected and what is still due for each
-              community bill.
-            </p>
+            <div className="f3cb-heroHeader">
+              <BackButton className="f3cb-backButton" />
+              <div className="f3cb-heroContent">
+                <span className="f3cb-kicker">Admin</span>
+                <h1 className="f3cb-title">Community Bills And Payment Slips</h1>
+                <p className="f3cb-subtitle">
+                  Distribute community electricity bills, then use payment slips to
+                  track how much has been collected and what is still due for each
+                  community bill.
+                </p>
+              </div>
+            </div>
           </div>
 
           <CommunityBillsSummaryPanel
@@ -168,9 +171,10 @@ export default function CommunityBillsAdminPage() {
               paymentSlips={paymentSlips}
               loading={loading}
               activeSlipId={activeSlipId}
+              onViewDetails={openPaymentSlipDetails}
               onUpdateStatus={(paymentSlipId, status) => {
                 if (status === "rejected") {
-                  handleRejectSlip(paymentSlipId);
+                  openRejectDialog(paymentSlipId);
                   return;
                 }
 
@@ -179,6 +183,23 @@ export default function CommunityBillsAdminPage() {
             />
           )}
         </section>
+
+        <PaymentSlipRejectionDialog
+          isOpen={rejectDialogState.isOpen}
+          rejectionReason={rejectDialogState.rejectionReason}
+          submitting={Boolean(activeSlipId)}
+          onReasonChange={setRejectReason}
+          onCancel={closeRejectDialog}
+          onSubmit={submitRejectDialog}
+        />
+
+        <AdminPaymentSlipDetailsDialog
+          isOpen={isSlipDetailsOpen}
+          paymentSlipData={selectedPaymentSlip}
+          loading={detailsLoading}
+          error={detailsError}
+          onClose={closePaymentSlipDetails}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,9 @@ import {
   fetchConsumptionRecord,
   fetchMemberConsumptionRecords,
   submitPaymentSlip,
+  updatePaymentSlip,
+  deletePaymentSlip,
+  getPaymentSlip,
 } from "../../services/feature-3/memberConsumptionApi";
 import { fetchCurrentUser } from "../../services/feature-3/currentUserApi";
 
@@ -34,6 +37,7 @@ export const getSlipActionLabel = (record) => {
 export const useMemberConsumption = ({
   isUploadMode,
   uploadConsumptionId,
+  uploadPaymentSlipId,
   navigate,
 }) => {
   const [memberId, setMemberId] = useState("");
@@ -84,21 +88,31 @@ export const useMemberConsumption = ({
     }
   };
 
-  const loadUploadTarget = async (consumptionId) => {
+  const loadUploadTarget = async (consumptionId, paymentSlipId = "") => {
     setUploadLoading(true);
     setError("");
 
     try {
-      const record = await fetchConsumptionRecord(consumptionId);
+      const [record, existingPaymentSlip] = await Promise.all([
+        fetchConsumptionRecord(consumptionId),
+        paymentSlipId ? getPaymentSlip(paymentSlipId).then((response) => response.data) : Promise.resolve(null),
+      ]);
       const storedUser = parseStoredUser();
 
-      setUploadTarget(record);
+      setUploadTarget({
+        ...record,
+        paymentSlipId: existingPaymentSlip?._id || "",
+        paymentSlipStatus: existingPaymentSlip?.status || "",
+        rejectionReason: existingPaymentSlip?.rejectionReason || "",
+      });
       setUploadForm({
-        amountPaid: String(record.amountOwed || ""),
-        paymentDate: new Date().toISOString().slice(0, 10),
-        referenceNumber: "",
-        payerName: storedUser.name || "",
-        notes: "",
+        amountPaid: String(existingPaymentSlip?.amountPaid ?? record.amountOwed ?? ""),
+        paymentDate: existingPaymentSlip?.paymentDate
+          ? new Date(existingPaymentSlip.paymentDate).toISOString().slice(0, 10)
+          : new Date().toISOString().slice(0, 10),
+        referenceNumber: existingPaymentSlip?.referenceNumber || "",
+        payerName: existingPaymentSlip?.payerName || storedUser.name || "",
+        notes: existingPaymentSlip?.notes || "",
         slipFile: null,
       });
     } catch (requestError) {
@@ -159,8 +173,8 @@ export const useMemberConsumption = ({
       return;
     }
 
-    loadUploadTarget(uploadConsumptionId);
-  }, [isUploadMode, uploadConsumptionId]);
+    loadUploadTarget(uploadConsumptionId, uploadPaymentSlipId);
+  }, [isUploadMode, uploadConsumptionId, uploadPaymentSlipId]);
 
   const handleUploadFieldChange = ({ name, value }) => {
     setUploadForm((current) => ({
@@ -215,13 +229,108 @@ export const useMemberConsumption = ({
       );
       formData.append("slipImage", uploadForm.slipFile);
 
-      setUploadMessage(await submitPaymentSlip(formData));
+      const response = await submitPaymentSlip(formData);
+      setUploadMessage(response.message || "Payment slip submitted successfully");
       setTimeout(() => {
+        handleSearch();
         navigate("/feature-3/member-consumption");
       }, 1000);
       return true;
     } catch (requestError) {
       setError(requestError.message || "Failed to upload payment slip");
+      return false;
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    setError("");
+    setUploadMessage("");
+
+    const storedUser = parseStoredUser();
+
+    if (!storedUser.id) {
+      setError("A logged-in user is required to update a payment slip.");
+      return false;
+    }
+
+    const paymentSlipId = uploadPaymentSlipId || uploadTarget?.paymentSlipId;
+
+    if (!paymentSlipId) {
+      setError("No payment slip selected.");
+      return false;
+    }
+
+    setUploadLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append(
+        "paymentSlipData",
+        JSON.stringify({
+          memberConsumptionId: uploadTarget._id,
+          userId: storedUser.id,
+          amountPaid: Number(uploadForm.amountPaid),
+          paymentDate: uploadForm.paymentDate,
+          referenceNumber: uploadForm.referenceNumber,
+          payerName: uploadForm.payerName,
+          notes: uploadForm.notes,
+        }),
+      );
+      if (uploadForm.slipFile) {
+        formData.append("slipImage", uploadForm.slipFile);
+      }
+
+      const response = await updatePaymentSlip(paymentSlipId, formData);
+      setUploadMessage(response.message || "Payment slip updated successfully");
+      setTimeout(() => {
+        handleSearch();
+        navigate("/feature-3/member-consumption");
+      }, 1000);
+      return true;
+    } catch (requestError) {
+      setError(requestError.message || "Failed to update payment slip");
+      return false;
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleDelete = async (target = uploadTarget) => {
+    setError("");
+    setUploadMessage("");
+
+    const paymentSlipId =
+      target?.paymentSlipId ||
+      target?.latestPaymentSlip?._id ||
+      target?._id;
+
+    if (!paymentSlipId) {
+      setError("No payment slip selected.");
+      return false;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this payment slip? This action cannot be undone.")) {
+      return false;
+    }
+
+    setUploadLoading(true);
+
+    try {
+      const response = await deletePaymentSlip(paymentSlipId);
+      setUploadMessage(response.message || "Payment slip deleted successfully");
+      setTimeout(() => {
+        if (!isUploadMode) {
+          handleSearch();
+        } else {
+          handleSearch();
+          navigate("/feature-3/member-consumption");
+        }
+      }, 1000);
+      return true;
+    } catch (requestError) {
+      setError(requestError.message || "Failed to delete payment slip");
       return false;
     } finally {
       setUploadLoading(false);
@@ -247,5 +356,7 @@ export const useMemberConsumption = ({
     handleUploadFieldChange,
     handleUploadFileChange,
     handleUploadSubmit,
+    handleUpdate,
+    handleDelete,
   };
 };

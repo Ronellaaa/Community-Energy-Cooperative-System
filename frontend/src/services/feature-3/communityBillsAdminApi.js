@@ -14,8 +14,13 @@ export const fetchPaymentSlips = async (status = "all") => {
   const query =
     status && status !== "all" ? `?status=${encodeURIComponent(status)}` : "";
 
-  const data = await apiGet(`/api/admin/payment-slips${query}`);
+  const data = await apiGet(`/api/payment-slips${query}`);
   return data.data || [];
+};
+
+export const fetchPaymentSlipDetails = async (paymentSlipId) => {
+  const data = await apiGet(`/api/payment-slips/${paymentSlipId}`);
+  return data.data;
 };
 
 export const distributeCommunityBill = async (billId) => {
@@ -35,7 +40,7 @@ export const updateCommunityPaymentSlipStatus = async ({
   status,
   rejectionReason,
 }) => {
-  const data = await apiSend(`/api/admin/payment-slips/${paymentSlipId}/status`, {
+  const data = await apiSend(`/api/payment-slips/${paymentSlipId}/status`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

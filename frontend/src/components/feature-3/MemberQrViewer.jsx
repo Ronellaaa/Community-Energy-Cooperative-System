@@ -17,9 +17,6 @@ const MemberQrViewer = ({ memberId, communityId }) => {
       <section className="f3mr-card f3mr-qrCard">
         <div className="f3mr-formHeader">
           <h2 className="f3mr-formTitle">View QR Code</h2>
-          <p className="f3mr-formText">
-            Open this page with a valid member ID and community ID to view the QR code.
-          </p>
         </div>
       </section>
     );
@@ -30,7 +27,7 @@ const MemberQrViewer = ({ memberId, communityId }) => {
       <div className="f3mr-formHeader">
         <h2 className="f3mr-formTitle">Member QR Code</h2>
         <p className="f3mr-formText">
-          Use this QR code to identify the member quickly when recording meter readings.
+          Use this QR code for quick meter readings.
         </p>
       </div>
 

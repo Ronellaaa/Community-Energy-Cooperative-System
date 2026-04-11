@@ -4,7 +4,11 @@ import {
   formatBillingPeriod,
   formatCurrency,
 } from "../../utils/feature-3/formatters";
-import { getSlipActionLabel } from "../../hooks/feature-3/useMemberConsumption";
+
+const getMemberSlipStatus = (slipStatus) => {
+  if (slipStatus === "pending") return "submitted";
+  return slipStatus || "not submitted";
+};
 
 export default function MemberConsumptionListView({
   memberId,
@@ -19,6 +23,8 @@ export default function MemberConsumptionListView({
   onCommunityIdChange,
   onSearch,
   onOpenUploadPage,
+  onViewPaymentSlip,
+  onDelete,
 }) {
   return (
     <div className="f3mc-page">
@@ -28,10 +34,10 @@ export default function MemberConsumptionListView({
       <div className="f3mc-shell">
         <section className="f3mc-hero">
           <div className="f3mc-panel">
-            <span className="f3mc-kicker">Feature 3 Member View</span>
+            <span className="f3mc-kicker">Member View</span>
             <h1 className="f3mc-title">Electricity Bill Share</h1>
             <p className="f3mc-subtitle">
-              Check how much you need to pay for your community electricity bill, including units consumed, billing period, payment status, and slip submission progress.
+              Check how much you need to pay for your community electricity bill.
             </p>
           </div>
 
@@ -39,7 +45,7 @@ export default function MemberConsumptionListView({
             <span className="f3mc-statLabel">Total Amount Owed</span>
             <span className="f3mc-statValue">{formatCurrency(totalAmountOwed)}</span>
             <span className="f3mc-statHint">
-              Based on all loaded billing periods for this member and community.
+              Based on all loaded billing periods.
             </span>
           </div>
         </section>
@@ -114,16 +120,18 @@ export default function MemberConsumptionListView({
                 {!loading && searched && records.length === 0 ? (
                   <tr>
                     <td colSpan="8" className="f3mc-emptyState">
-                      No member consumption records were found for this member and community.
+                      No member consumption records were found.
                     </td>
                   </tr>
                 ) : null}
 
                 {records.map((record) => {
-                  const canUploadSlip =
-                    record.paymentStatus === "pending" &&
-                    record.latestPaymentSlip?.status !== "pending" &&
-                    record.latestPaymentSlip?.status !== "approved";
+                  const actualSlipStatus = record.latestPaymentSlip?.status || null;
+                  const displaySlipStatus = getMemberSlipStatus(actualSlipStatus);
+                  const isSubmittedSlip = actualSlipStatus === "pending";
+                  const canUploadSlip = record.paymentStatus === "pending" && !record.latestPaymentSlip;
+                  const canUploadAgain =
+                    record.paymentStatus === "pending" && actualSlipStatus === "rejected";
 
                   return (
                     <tr key={record._id}>
@@ -138,19 +146,67 @@ export default function MemberConsumptionListView({
                         </span>
                       </td>
                       <td>
-                        <span className={`f3mc-pill f3mc-pill-${record.latestPaymentSlip?.status || "draft"}`}>
-                          {record.latestPaymentSlip?.status || "not submitted"}
+                        <span className={`f3mc-pill f3mc-pill-${displaySlipStatus.replace(/\s+/g, "-")}`}>
+                          {displaySlipStatus}
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="f3mc-rowBtn"
-                          onClick={() => onOpenUploadPage(record)}
-                          disabled={!canUploadSlip}
-                        >
-                          {getSlipActionLabel(record)}
-                        </button>
+                        <div className="f3mc-actionButtons">
+                          {canUploadSlip ? (
+                            <button
+                              type="button"
+                              className="f3mc-rowBtn f3mc-viewBtn"
+                              onClick={() => onOpenUploadPage(record)}
+                            >
+                              Upload Payment Slip
+                            </button>
+                          ) : null}
+
+                          {canUploadAgain ? (
+                            <button
+                              type="button"
+                              className="f3mc-rowBtn f3mc-viewBtn"
+                              onClick={() =>
+                                onOpenUploadPage(
+                                  record.latestPaymentSlip || record,
+                                  record.latestPaymentSlip?._id,
+                                )
+                              }
+                            >
+                              Upload Again
+                            </button>
+                          ) : null}
+
+                          {isSubmittedSlip ? (
+                            <>
+                              <button
+                                type="button"
+                                className="f3mc-rowBtn f3mc-viewBtn"
+                                onClick={() => onViewPaymentSlip(record.latestPaymentSlip._id)}
+                              >
+                                View Payment Slip
+                              </button>
+                              <button
+                                type="button"
+                                className="f3mc-rowBtn f3mc-updateBtn"
+                                onClick={() => onOpenUploadPage(record, record.latestPaymentSlip?._id)}
+                              >
+                                Update
+                              </button>
+                              <button
+                                type="button"
+                                className="f3mc-rowBtn f3mc-deleteBtn"
+                                onClick={() => onDelete(record)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          ) : null}
+
+                          {!canUploadSlip && !canUploadAgain && !isSubmittedSlip ? (
+                            <span className="f3mc-actionHint">No actions available</span>
+                          ) : null}
+                        </div>
                       </td>
                     </tr>
                   );

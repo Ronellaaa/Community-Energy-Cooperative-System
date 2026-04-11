@@ -48,6 +48,47 @@
   gap: 24px;
 }
 
+.f3cb-heroHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.f3cb-heroContent {
+  flex: 1;
+}
+
+.f3cb-backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.f3cb-backButton:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(148, 163, 184, 0.5);
+  color: #334155;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.f3cb-backButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
 .f3cb-panel {
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(148, 163, 184, 0.22);
@@ -322,9 +363,16 @@
 }
 
 .f3cb-linkBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  background: transparent;
   color: #0f766e;
   font-weight: 700;
-  text-decoration: none;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .f3cb-actionGroup {
@@ -452,6 +500,86 @@
   color: #64748b;
 }
 
+.f3cb-modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.38);
+  backdrop-filter: blur(8px);
+}
+
+.f3cb-modalCard {
+  width: min(100%, 560px);
+  border-radius: 28px;
+  padding: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(45, 212, 191, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.22);
+}
+
+.f3cb-modalCardWide {
+  width: min(100%, 1080px);
+  max-height: min(92vh, 980px);
+  overflow: auto;
+}
+
+.f3cb-modalHeader {
+  margin-bottom: 18px;
+}
+
+.f3cb-modalTitle {
+  margin: 12px 0 8px;
+  font-family: "Syne", sans-serif;
+  font-size: 1.9rem;
+  color: #0f172a;
+}
+
+.f3cb-modalText {
+  margin: 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.f3cb-modalField {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.f3cb-modalField textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 132px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 14px 16px;
+  font: inherit;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.96);
+  box-sizing: border-box;
+}
+
+.f3cb-modalField textarea:focus {
+  outline: none;
+  border-color: rgba(14, 116, 144, 0.45);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+}
+
+.f3cb-modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 900px) {
   .f3cb-hero,
   .f3cb-toolbar {
@@ -484,5 +612,9 @@
   .f3cb-select,
   .f3cb-refreshBtn {
     width: 100%;
+  }
+
+  .f3cb-modalCard {
+    padding: 22px;
   }
 }

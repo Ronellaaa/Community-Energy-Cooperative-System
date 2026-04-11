@@ -30,6 +30,8 @@ import fundingSourceRoutes from "./routes/finance-payments/fundingSourceRoute.js
 //Feature 4 routes
 import creditRoutes from "./routes/feature-3/credit.js";
 import billRoutes from "./routes/feature-3/billRoutes.js";
+import paymentSlipRoutes from "./routes/feature-3/paymentSlipRoutes.js";
+import memberPaymentSlipRoutes from "./routes/feature-3/member.payment.slip.routes.js";
 import adminBillRoutes from "./routes/feature-3/adminBillRoutes.js";
 import qrRoutes from "./routes/feature-3/qrRoutes.js";
 import meterReadingRoutes from "./routes/feature-3/manager.reading.routes.js";
@@ -94,6 +96,8 @@ app.use("/api/funding-sources", fundingSourceRoutes);
 //credit and bill routes
 app.use("/api/credit", creditRoutes);
 app.use("/api/bills", billRoutes); // Add bill routes
+app.use("/api/payment-slips", paymentSlipRoutes); // Admin payment slip routes
+app.use("/api/member-payment-slips", memberPaymentSlipRoutes); // Member payment slip routes
 app.use("/api/admin", adminBillRoutes); // Admin routes
 app.use("/api/qr", qrRoutes);
 app.use("/api", meterReadingRoutes);

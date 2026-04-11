@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   distributeCommunityBill,
   fetchCommunityBills,
+  fetchPaymentSlipDetails,
   fetchPaymentSlips,
   updateCommunityPaymentSlipStatus,
 } from "../../services/feature-3/communityBillsAdminApi";
@@ -18,6 +19,15 @@ export const useCommunityBillsAdmin = () => {
   const [activeSlipId, setActiveSlipId] = useState("");
   const [distributionFilter, setDistributionFilter] = useState("all");
   const [paymentSlipFilter, setPaymentSlipFilter] = useState("pending");
+  const [selectedPaymentSlip, setSelectedPaymentSlip] = useState(null);
+  const [isSlipDetailsOpen, setIsSlipDetailsOpen] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState("");
+  const [rejectDialogState, setRejectDialogState] = useState({
+    isOpen: false,
+    paymentSlipId: "",
+    rejectionReason: "",
+  });
 
   const visibleCount = useMemo(
     () =>
@@ -141,10 +151,73 @@ export const useCommunityBillsAdmin = () => {
       if (activeView === "community-bills") {
         await loadBills();
       }
+      return true;
     } catch (requestError) {
       setError(requestError.message || "Failed to update payment slip status");
+      return false;
     } finally {
       setActiveSlipId("");
+    }
+  };
+
+  const openPaymentSlipDetails = async (paymentSlipId) => {
+    setIsSlipDetailsOpen(true);
+    setDetailsLoading(true);
+    setSelectedPaymentSlip(null);
+    setDetailsError("");
+
+    try {
+      setSelectedPaymentSlip(await fetchPaymentSlipDetails(paymentSlipId));
+    } catch (requestError) {
+      setDetailsError(requestError.message || "Failed to load payment slip details");
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const closePaymentSlipDetails = () => {
+    setIsSlipDetailsOpen(false);
+    setSelectedPaymentSlip(null);
+    setDetailsLoading(false);
+    setDetailsError("");
+  };
+
+  const openRejectDialog = (paymentSlipId) => {
+    setRejectDialogState({
+      isOpen: true,
+      paymentSlipId,
+      rejectionReason: "",
+    });
+  };
+
+  const closeRejectDialog = () => {
+    setRejectDialogState({
+      isOpen: false,
+      paymentSlipId: "",
+      rejectionReason: "",
+    });
+  };
+
+  const setRejectReason = (rejectionReason) => {
+    setRejectDialogState((currentState) => ({
+      ...currentState,
+      rejectionReason,
+    }));
+  };
+
+  const submitRejectDialog = async () => {
+    if (!rejectDialogState.paymentSlipId || !rejectDialogState.rejectionReason.trim()) {
+      return;
+    }
+
+    const wasSuccessful = await handlePaymentSlipStatusUpdate({
+      paymentSlipId: rejectDialogState.paymentSlipId,
+      status: "rejected",
+      rejectionReason: rejectDialogState.rejectionReason.trim(),
+    });
+
+    if (wasSuccessful) {
+      closeRejectDialog();
     }
   };
 
@@ -170,5 +243,16 @@ export const useCommunityBillsAdmin = () => {
     handlePaymentSlipFilterChange,
     handleDistribute,
     handlePaymentSlipStatusUpdate,
+    selectedPaymentSlip,
+    isSlipDetailsOpen,
+    detailsLoading,
+    detailsError,
+    openPaymentSlipDetails,
+    closePaymentSlipDetails,
+    rejectDialogState,
+    openRejectDialog,
+    closeRejectDialog,
+    setRejectReason,
+    submitRejectDialog,
   };
 };
