@@ -234,6 +234,26 @@ export default function UserProjectDetails() {
           ← Back to Projects
         </button>
 
+                {/* RIGHT SIDE BUTTON */}
+                <button
+                  onClick={() => {
+                    if (!project?._id) return;
+                    navigate(`/finance-payments/project/${project._id}`);
+                  }}
+                  style={{
+                    padding: "10px 18px",
+                    background: "rgba(34,197,94,0.15)",
+                    border: "1px solid rgba(34,197,94,0.3)",
+                    borderRadius: "10px",
+                    color: "#4ade80",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                  }}
+                >
+                  Add Payment
+                </button>
+            </div>
+            </div>
         {/* Feedback Message */}
         {feedback && (
           <FeedbackMessage

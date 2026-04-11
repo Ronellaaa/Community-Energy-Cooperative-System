@@ -1,99 +1,97 @@
-import { apiRequest } from "../../../api";
+import { financePaymentsApi } from "../../../api";
 
-const getToken = () => localStorage.getItem("token");
-
-export const getCurrentAuthUser = () => {
+export const getStoredFinanceUser = () => {
   try {
-    const stored = JSON.parse(localStorage.getItem("user") || "null");
-    if (!stored) return null;
-    return {
-      id: stored.id || stored._id || stored.userId || "",
-      name: stored.name || "User",
-      role: stored.role || "USER",
-      communityId: stored.communityId || null,
-    };
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    return user
+      ? {
+          id: user.id || user._id || "",
+          name: user.name || "User",
+          role: user.role || "USER",
+          communityId: user.communityId || null,
+        }
+      : null;
   } catch {
     return null;
   }
 };
 
-export const financeRequest = (path, options) =>
-  apiRequest(path, {
-    ...options,
-    token: getToken(),
-  });
+export const isFinanceManager = (role) => role === "ADMIN" || role === "OFFICER";
 
-export const paginateItems = (items, page, pageSize) => {
+export const paginateItems = (items, page, pageSize = 6) => {
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
-  const safePage = Math.min(totalPages, Math.max(1, page));
-  const start = (safePage - 1) * pageSize;
+  const safePage = Math.min(Math.max(page, 1), totalPages);
+  const startIndex = (safePage - 1) * pageSize;
+
   return {
-    items: items.slice(start, start + pageSize),
     page: safePage,
     totalPages,
-    totalItems: items.length,
-  };
-};
-
-export const buildProjectBundle = async (projectId) => {
-  const [project, summaryRes, recordsRes, paymentsRes, expensesRes, sourcesRes] = await Promise.all([
-    financeRequest(`/api/projects/${projectId}`),
-    financeRequest(`/api/funding-records/summary/${projectId}`),
-    financeRequest(`/api/funding-records/project/${projectId}`),
-    financeRequest(`/api/member-payments/project/${projectId}`),
-    financeRequest(`/api/maintenance-expenses/project/${projectId}`),
-    financeRequest("/api/funding-sources"),
-  ]);
-
-  return {
-    project,
-    summary: summaryRes.data,
-    fundingRecords: recordsRes.data || [],
-    memberPayments: paymentsRes.data || [],
-    maintenanceExpenses: expensesRes.data || [],
-    fundingSources: sourcesRes.data || [],
+    items: items.slice(startIndex, startIndex + pageSize),
   };
 };
 
 export const loadFinanceProjects = async () => {
-  const projects = await financeRequest("/api/projects");
-  const bundles = await Promise.all(
-    (projects || []).map(async (project) => {
-      const summaryRes = await financeRequest(`/api/funding-records/summary/${project._id}`);
-      return {
-        project,
-        summary: summaryRes.data,
-      };
+  const projects = await financePaymentsApi.getProjects();
+  const projectList = Array.isArray(projects) ? projects : [];
+
+  const projectsWithSummary = await Promise.all(
+    projectList.map(async (project) => {
+      try {
+        const summaryRes = await financePaymentsApi.getFundingSummary(project._id);
+        return {
+          ...project,
+          financeSummary: summaryRes?.data || {},
+        };
+      } catch {
+        return {
+          ...project,
+          financeSummary: {},
+        };
+      }
     }),
   );
 
-  return bundles.map(({ project, summary }) => ({
-    id: project._id,
-    name: project.name,
-    type: project.type,
-    assignedMembers: project.assignedMembers || [],
-    projectStatus: project.status,
-    officerApprovalStatus:
-      project.status === "Approved" || project.status === "Active"
-        ? "Approved by Officer"
-        : summary.availableForInstallation >= summary.projectCost
-          ? "Ready for Approval"
-          : "Pending Officer Review",
-    targetAmount: summary.projectCost,
-    minimumRequiredAmount: summary.projectCost,
-    collectedAmount: summary.availableForInstallation,
-    fundingPercentage: summary.projectCost
-      ? Math.min(100, Math.round((summary.availableForInstallation / summary.projectCost) * 100))
-      : 0,
-    readyForApproval: summary.availableForInstallation >= summary.projectCost,
-    status:
-      project.status === "Active"
-        ? "Active"
-        : project.status === "Approved"
-          ? "Approved"
-          : summary.availableForInstallation >= summary.projectCost
-            ? "Ready for Approval"
-            : "Collecting Funds",
-    summary,
-  }));
+  return projectsWithSummary;
 };
+
+export const loadProjectFinanceBundle = async (projectId) => {
+  const [project, summaryRes, recordRes, contributionRes, maintenanceRes, sourceRes] = await Promise.all([
+    financePaymentsApi.getProject(projectId),
+    financePaymentsApi.getFundingSummary(projectId),
+    financePaymentsApi.getFundRecords(projectId),
+    financePaymentsApi.getMemberContributions(projectId),
+    financePaymentsApi.getMaintenanceRecords(projectId),
+    financePaymentsApi.getFundSources(),
+  ]);
+
+  return {
+    project,
+    summary: summaryRes?.data || {},
+    fundRecords: recordRes?.data || [],
+    contributions: contributionRes?.data || [],
+    maintenanceRecords: maintenanceRes?.data || [],
+    fundSources: sourceRes?.data || [],
+  };
+};
+
+export const loadCommunityMembersForProject = async (project, role) => {
+  if (!project?.communityId?._id && !project?.communityId) {
+    return project?.assignedMembers || [];
+  }
+
+  if (role !== "ADMIN") {
+    return project?.assignedMembers || [];
+  }
+
+  try {
+    const users = await financePaymentsApi.getAdminUsers();
+    const communityId = project.communityId?._id || project.communityId;
+    return Array.isArray(users)
+      ? users.filter((user) => (user.communityId?._id || user.communityId) === communityId)
+      : project?.assignedMembers || [];
+  } catch {
+    return project?.assignedMembers || [];
+  }
+};
+
+export { financePaymentsApi };

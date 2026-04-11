@@ -55,6 +55,52 @@ export const projectApi = {
 // Community APIs
 export const communityApi = {
   getAll: () => apiRequest("/api/communities"),
-
   getApproved: () => apiRequest("/api/communities/approved"),
+};
+
+// Finance & Payments APIs
+export const financePaymentsApi = {
+  getProjects: () => apiRequest("/api/projects"),
+  getProject: (projectId) => apiRequest(`/api/projects/${projectId}`),
+  approveProject: (projectId) =>
+    apiRequest(`/api/projects/${projectId}/approve`, { method: "PATCH" }),
+
+  getFundSources: () => apiRequest("/api/funding-sources"),
+  createFundSource: (data) =>
+    apiRequest("/api/funding-sources", { method: "POST", body: data }),
+  updateFundSource: (id, data) =>
+    apiRequest(`/api/funding-sources/${id}`, { method: "PUT", body: data }),
+  deleteFundSource: (id) =>
+    apiRequest(`/api/funding-sources/${id}`, { method: "DELETE" }),
+
+  getFundingSummary: (projectId) =>
+    apiRequest(`/api/funding-records/summary/${projectId}`),
+  getFundRecords: (projectId) =>
+    apiRequest(`/api/funding-records/project/${projectId}`),
+  createFundRecord: (data) =>
+    apiRequest("/api/funding-records", { method: "POST", body: data }),
+  updateFundRecord: (id, data) =>
+    apiRequest(`/api/funding-records/${id}`, { method: "PUT", body: data }),
+  deleteFundRecord: (id) =>
+    apiRequest(`/api/funding-records/${id}`, { method: "DELETE" }),
+
+  getMemberContributions: (projectId) =>
+    apiRequest(`/api/member-payments/project/${projectId}`),
+  createMemberContribution: (data) =>
+    apiRequest("/api/member-payments", { method: "POST", body: data }),
+  updateMemberContribution: (id, data) =>
+    apiRequest(`/api/member-payments/${id}`, { method: "PUT", body: data }),
+  deleteMemberContribution: (id) =>
+    apiRequest(`/api/member-payments/${id}`, { method: "DELETE" }),
+
+  getMaintenanceRecords: (projectId) =>
+    apiRequest(`/api/maintenance-expenses/project/${projectId}`),
+  createMaintenanceRecord: (data) =>
+    apiRequest("/api/maintenance-expenses", { method: "POST", body: data }),
+  updateMaintenanceRecord: (id, data) =>
+    apiRequest(`/api/maintenance-expenses/${id}`, { method: "PUT", body: data }),
+  deleteMaintenanceRecord: (id) =>
+    apiRequest(`/api/maintenance-expenses/${id}`, { method: "DELETE" }),
+
+  getAdminUsers: () => apiRequest("/api/admin/users"),
 };
