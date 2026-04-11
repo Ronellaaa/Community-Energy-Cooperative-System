@@ -53,7 +53,16 @@ export const createBill = async (req, res) => {
 // GET ALL BILLS WITH FILTERING SUPPORT (CALLED FROM ROUTES)
 export const getBills = async (req, res) => {
   try {
-    const { status, startDate, endDate, userId } = req.query;
+    // Get userId from request (assuming auth middleware sets req.user)
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const { status, startDate, endDate } = req.query;
     
     // Call service to get bills with filters
     const result = await getBillsService({ status, startDate, endDate, userId });
@@ -82,7 +91,16 @@ export const getBills = async (req, res) => {
 // GET SINGLE BILL BY ID (CALLED FROM ROUTES)
 export const getBillById = async (req, res) => {
   try {
-    const bill = await getBillByIdService(req.params.id);
+    // Get userId from request (assuming auth middleware sets req.user)
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const bill = await getBillByIdService(req.params.id, userId);
     
     if (!bill) {
       return res.status(404).json({
@@ -106,11 +124,20 @@ export const getBillById = async (req, res) => {
 // UPDATE BILL FULLY - PUT (CALLED FROM ROUTES)
 export const updateBill = async (req, res) => {
   try {
+    // Get userId from request (assuming auth middleware sets req.user)
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
     const uploadedFile = getUploadedFile(req);
     let updateData = req.body.billData ? JSON.parse(req.body.billData) : req.body;
     
     // Call service to update bill
-    const bill = await updateBillService(req.params.id, updateData, uploadedFile);
+    const bill = await updateBillService(req.params.id, updateData, uploadedFile, userId);
     
     res.json({
       success: true,
@@ -136,7 +163,16 @@ export const updateBill = async (req, res) => {
 // DELETE BILL - DELETE (CALLED FROM ROUTES)
 export const deleteBill = async (req, res) => {
   try {
-    await deleteBillService(req.params.id);
+    // Get userId from request (assuming auth middleware sets req.user)
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    await deleteBillService(req.params.id, userId);
     
     res.json({
       success: true,
@@ -146,23 +182,21 @@ export const deleteBill = async (req, res) => {
     console.error('Error deleting bill:', error);
     
     if (error.message === 'Bill not found') {
-      return res.status(404).json({
+      res.status(404).json({
+        success: false,
+        message: 'Bill not found'
+      });
+    } else if (error.message === 'Cannot delete bill that is not in pending state') {
+      res.status(403).json({
+        success: false,
+        message: 'Cannot delete bill that is not in pending state'
+      });
+    } else {
+      res.status(500).json({
         success: false,
         message: error.message
       });
     }
-
-    if (error.message === 'Cannot delete bill that is not in pending state') {
-      return res.status(403).json({
-        success: false,
-        message: error.message
-      });
-    }
-    
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
   }
 };
 

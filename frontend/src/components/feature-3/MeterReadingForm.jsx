@@ -81,8 +81,7 @@ const MeterReadingForm = ({
           <div className="f3mr-entryCard">
             <h4 className="f3mr-entryTitle">Scan QR Code</h4>
             <p className="f3mr-entryText">
-              Use the member QR code to fill the member and community IDs
-              automatically.
+              Use the member QR code to autofill the member and community IDs.
             </p>
             {!showScanner ? (
               <ScanButton onClick={openScanner} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import MeterReadingForm from '../../components/feature-3/MeterReadingForm';
+import BackButton from '../../components/feature-3/BackButton';
 import { useMeterReadingPage } from '../../hooks/feature-3/useMeterReadingPage';
 import '../../styles/feature-3/meter-reading.css';
 
@@ -24,13 +25,18 @@ export default function MeterReadingPage() {
       <div className="f3mr-shell">
         <section className="f3mr-hero">
           <div className="f3mr-card f3mr-heroCard">
-            <span className="f3mr-kicker">Community Energy</span>
-            <h1 className="f3mr-title">
-              Smart <span className="f3mr-titleAccent">Meter Reading</span>
-            </h1>
-            <p className="f3mr-subtitle">
-              Record monthly electricity meter readings quickly and accurately for your community.
-            </p>
+            <div className="f3mr-heroHeader">
+              <BackButton className="f3mr-backButton" />
+              <div className="f3mr-heroContent">
+                <span className="f3mr-kicker">Community Energy</span>
+                <h1 className="f3mr-title">
+                  Smart <span className="f3mr-titleAccent">Meter Reading</span>
+                </h1>
+                <p className="f3mr-subtitle">
+                  Record monthly electricity meter readings quickly and accurately.
+                </p>
+              </div>
+            </div>
 
             <div className="f3mr-metrics">
               <div className="f3mr-metric">
@@ -61,7 +67,7 @@ export default function MeterReadingPage() {
                 <div>
                   <span className="f3mr-checkLabel">Scan the member QR code</span>
                   <span className="f3mr-checkText">
-                    This helps open the correct member record before you enter the meter value.
+                    This helps get the member details before you enter the meter value.
                   </span>
                 </div>
               </div>

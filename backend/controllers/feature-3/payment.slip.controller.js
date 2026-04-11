@@ -2,6 +2,7 @@ import fs from "fs";
 import {
   createPaymentSlip as createPaymentSlipService,
   getAdminPaymentSlips as getAdminPaymentSlipsService,
+  getAdminPaymentSlipById as getAdminPaymentSlipByIdService,
   updatePaymentSlipStatus as updatePaymentSlipStatusService,
 } from "../../service/feature-3/payment.slip.service.js";
 
@@ -70,6 +71,24 @@ export const getAdminPaymentSlips = async (req, res) => {
   } catch (error) {
     console.error("Error fetching payment slips:", error);
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getAdminPaymentSlipById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const paymentSlip = await getAdminPaymentSlipByIdService(id);
+
+    res.json({
+      success: true,
+      data: paymentSlip,
+    });
+  } catch (error) {
+    console.error("Error fetching payment slip:", error);
+    res.status(error.message === "Payment slip not found" ? 404 : 500).json({
       success: false,
       message: error.message,
     });

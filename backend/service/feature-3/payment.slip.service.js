@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 import CommunityBill from "../../model/feature-3/CommunityBill.js";
 import MemberConsumption from "../../model/feature-3/MemberConsumption.js";
 import PaymentSlip from "../../model/feature-3/PaymentSlip.js";
-import { deleteFromCloudinary, uploadToCloudinary } from "./handleImgService.js";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "./handleImgService.js";
 
 const roundToCurrency = (value) => Number((Number(value) || 0).toFixed(2));
 
@@ -15,12 +18,23 @@ const getRemainingAmount = (record) =>
 const isConsumptionFullyPaid = (record) => getRemainingAmount(record) <= 0.01;
 
 const ensureObjectId = (value, fieldName) => {
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    throw new Error(`${fieldName} is invalid`);
+  if (!value) {
+    throw new Error(`${fieldName} is required`);
   }
 
-  return new mongoose.Types.ObjectId(value);
+  // Strip "MC-" prefix if present
+  let cleanId = String(value);
+  if (cleanId.startsWith("MC-")) {
+    cleanId = cleanId.substring(3);
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(cleanId)) {
+    throw new Error(`${fieldName} is invalid: ${value}`);
+  }
+
+  return new mongoose.Types.ObjectId(cleanId);
 };
+
 
 const syncCommunityBillPaymentStatus = async ({
   communityId,
@@ -165,9 +179,17 @@ export const getAdminPaymentSlips = async (filters = {}) => {
     query.status = status;
   }
 
-  return await PaymentSlip.find(query)
-    .sort({ createdAt: -1 })
-    .lean();
+  return await PaymentSlip.find(query).sort({ createdAt: -1 }).lean();
+};
+
+export const getAdminPaymentSlipById = async (paymentSlipId) => {
+  const paymentSlip = await PaymentSlip.findById(paymentSlipId).lean();
+
+  if (!paymentSlip) {
+    throw new Error("Payment slip not found");
+  }
+
+  return paymentSlip;
 };
 
 export const updatePaymentSlipStatus = async (paymentSlipId, updateData) => {

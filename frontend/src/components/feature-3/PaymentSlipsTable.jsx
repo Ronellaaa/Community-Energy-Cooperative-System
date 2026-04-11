@@ -9,6 +9,7 @@ export default function PaymentSlipsTable({
   paymentSlips,
   loading,
   activeSlipId,
+  onViewDetails,
   onUpdateStatus,
 }) {
   return (
@@ -57,14 +58,13 @@ export default function PaymentSlipsTable({
                 </td>
                 <td>
                   {paymentSlip.slipImage?.url ? (
-                    <a
-                      href={paymentSlip.slipImage.url}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      type="button"
                       className="f3cb-linkBtn"
+                      onClick={() => onViewDetails(paymentSlip._id)}
                     >
                       View Slip
-                    </a>
+                    </button>
                   ) : (
                     "-"
                   )}

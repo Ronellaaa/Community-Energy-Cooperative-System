@@ -14,7 +14,13 @@ export default function MemberPaymentSlipUploadView({
   onFieldChange,
   onFileChange,
   onSubmit,
+  onUpdate,
+  onDelete,
 }) {
+  const isEditingPaymentSlip = Boolean(uploadTarget?.paymentSlipId);
+  const showRejectionReason =
+    uploadTarget?.paymentSlipStatus === "rejected" && uploadTarget?.rejectionReason;
+
   return (
     <div className="f3mc-page">
       <div className="f3mc-aura f3mc-aura-a" />
@@ -24,13 +30,19 @@ export default function MemberPaymentSlipUploadView({
         <section className="f3mc-panel">
           <div className="f3mc-formHeader">
             <div>
-              <span className="f3mc-kicker">Feature 3 Member View</span>
-              <h1 className="f3mc-title f3mc-uploadTitle">Upload Payment Slip</h1>
+              <span className="f3mc-kicker">Member View</span>
+              <h1 className="f3mc-title f3mc-uploadTitle">
+                {isEditingPaymentSlip ? 'Update Payment Slip' : 'Upload Payment Slip'}
+              </h1>
               <p className="f3mc-subtitle">
-                Submit your proof of payment for admin review. Once approved, this record will move from pending to paid.
+                {isEditingPaymentSlip
+                  ? 'Update your payment slip details and upload new image if needed.'
+                  : 'Submit your proof of payment for admin review. Once approved, this record will move from pending to paid.'
+                }
               </p>
             </div>
 
+            
             <button type="button" className="f3mc-backBtn" onClick={onBack}>
               Back to Consumption List
             </button>
@@ -38,6 +50,11 @@ export default function MemberPaymentSlipUploadView({
 
           {error ? <div className="f3mc-message f3mc-error">{error}</div> : null}
           {uploadMessage ? <div className="f3mc-message f3mc-info">{uploadMessage}</div> : null}
+          {showRejectionReason ? (
+            <div className="f3mc-message f3mc-error">
+              <strong>Previous rejection reason:</strong> {uploadTarget.rejectionReason}
+            </div>
+          ) : null}
 
           {uploadLoading && !uploadTarget ? (
             <div className="f3mc-message f3mc-info">Loading payment record...</div>
@@ -48,7 +65,7 @@ export default function MemberPaymentSlipUploadView({
               className="f3mc-uploadForm"
               onSubmit={(event) => {
                 event.preventDefault();
-                onSubmit();
+                isEditingPaymentSlip ? onUpdate() : onSubmit();
               }}
             >
               <div className="f3mc-summaryCard">
@@ -160,13 +177,13 @@ export default function MemberPaymentSlipUploadView({
                     type="file"
                     accept=".jpg,.jpeg,.png,.gif,.pdf"
                     onChange={(event) => onFileChange(event.target.files?.[0] || null)}
-                    required
+                    required={!isEditingPaymentSlip}
                   />
                 </label>
               </div>
 
               <button type="submit" className="f3mc-searchBtn" disabled={uploadLoading}>
-                {uploadLoading ? "Uploading..." : "Submit Payment Slip"}
+                {uploadLoading ? "Saving..." : isEditingPaymentSlip ? "Update Payment Slip" : "Submit Payment Slip"}
               </button>
             </form>
           ) : null}

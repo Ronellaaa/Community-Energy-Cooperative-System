@@ -81,7 +81,7 @@ export const useMeterReading = ({ month, year, lookupPreviousReading, onSubmit, 
         if (result.previousReadingFound) {
           setPreviousReading(String(result.previousReading));
           setPreviousReadingLocked(true);
-          setLookupMessage('Previous reading found automatically and locked for consistency.');
+          setLookupMessage('Previous reading found for the member.');
         } else {
           setPreviousReading('');
           setPreviousReadingLocked(false);

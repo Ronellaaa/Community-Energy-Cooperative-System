@@ -32,7 +32,7 @@ export const getBills = async (filters) => {
   if (userId) {
     query.userId = new mongoose.Types.ObjectId(userId);
   } else {
-    query.userId = TEST_USER_ID;
+    throw new Error("User ID is required");
   }
   
   // Add status filter if provided
@@ -61,10 +61,14 @@ export const getBills = async (filters) => {
 };
 
 // GET SINGLE BILL BY ID SERVICE (CALLED FROM CONTROLLER)
-export const getBillById = async (id) => {
+export const getBillById = async (id, userId) => {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
   const bill = await Bill.findOne({
     _id: id,
-    userId: TEST_USER_ID
+    userId
   });
   
   return bill;
@@ -99,8 +103,8 @@ export const updateBill = async (id, updateData, file) => {
     updateData.billImage = await uploadToCloudinary(file);
   }
   
-  // Ensure userId remains the test user
-  updateData.userId = TEST_USER_ID;
+  // Use provided userId
+  updateData.userId = userId;
   
   const bill = await Bill.findByIdAndUpdate(
     id,
@@ -112,11 +116,11 @@ export const updateBill = async (id, updateData, file) => {
 };
 
 // DELETE BILL SERVICE (CALLED FROM CONTROLLER)
-export const deleteBill = async (id) => {
+export const deleteBill = async (id, userId) => {
   // Find existing bill
   const bill = await Bill.findOne({
     _id: id,
-    userId: TEST_USER_ID
+    userId
   });
   
   if (!bill) {
@@ -125,7 +129,7 @@ export const deleteBill = async (id) => {
     throw error;
   }
 
-    // Check if bill is in pending state
+  // Check if bill is in pending state
   if (bill.status !== 'pending') {
     const error = new Error('Cannot delete bill that is not in pending state');
     error.status = 403; // Forbidden
@@ -138,22 +142,26 @@ export const deleteBill = async (id) => {
   }
   
   // Delete bill from database
-  await bill.deleteOne();
+  await Bill.deleteOne({ _id: id });
   
   return { message: 'Bill deleted successfully' };
 };
 
-export const getUserBillSummaryService = async () => {
-  const bills = await Bill.find({ userId: TEST_USER_ID });
+export const getUserBillSummaryService = async (userId) => {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  const bills = await Bill.find({ userId });
   
   // Get credit summary with remaining amount
-  const credits = await Credit.find({ userId: TEST_USER_ID });
+  const credits = await Credit.find({ userId });
   const totalOriginalCredits = credits.reduce((sum, c) => sum + (c.originalAmount || c.creditAmount || 0), 0);
   const totalRemainingCredits = credits.reduce((sum, c) => sum + (c.remainingAmount || 0), 0);
   const totalUsedCredits = totalOriginalCredits - totalRemainingCredits;
   
   return {
-    userId: TEST_USER_ID,
+    userId,
     bills: {
       total: bills.length,
       pending: bills.filter(b => b.status === 'pending').length,
