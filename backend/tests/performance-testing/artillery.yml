@@ -76,3 +76,51 @@ scenarios:
           url: "/api/funding-records/project/69a089bd195b9cfe17a86dee"
           headers:
             Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
+  
+  - name: "Admin Login"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "sethmi@gmail.com"
+            password: "sethmi123"
+
+  - name: "Admin Create Project"
+    flow:
+      - post:
+          url: "/api/projects"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIzZjA4MzYxZmVhMGYzMjc2NzllNSIsImlhdCI6MTc3NTk3NjkyOSwiZXhwIjoxNzc2NTgxNzI5fQ.1P69tp9mNe1m7G7OKenfKe1OKcBjnCEqDSXq4JoAB1I"
+          json:
+            projectType: "Community"
+            communityId: "69d62b03c7b538cd6c625970"
+            capacityKW: 10
+            cost: 50000
+
+  - name: "Admin Approve Project"
+    flow:
+      - patch:
+          url: "/api/projects/69db40e7361fea0f32767b07/approve"
+          headers:
+            Authorization: "{{ adminToken }}"
+
+  - name: "Admin Reject Project"
+    flow:
+      - patch:
+          url: "/api/projects/69db40e7361fea0f32767b07/reject"
+          headers:
+            Authorization: "{{ adminToken }}"
+
+  - name: "Admin Activate Project"
+    flow:
+      - patch:
+          url: "/api/projects/69db40e7361fea0f32767b07/activate"
+          headers:
+            Authorization: "{{ adminToken }}"
+
+  - name: "Admin Delete Project"
+    flow:
+      - delete:
+          url: "/api/projects/69db40e7361fea0f32767b07"
+          headers:
+            Authorization: "{{ adminToken }}"
