@@ -1,0 +1,78 @@
+config:
+  target: "http://localhost:5001"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 10
+      name: "Normal load"
+
+scenarios:
+  - name: "User Registration"
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "Test User {{ $randomString() }}"
+            email: "test{{ $randomInt(1000,9999) }}@mail.com"
+            password: "Test1234"
+            role: "USER"
+
+  - name: "User Login"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "hasini17@gmail.com"
+            password: "onelladias"
+
+  - name: "Get Communities"
+    flow:
+      - get:
+          url: "/api/communities"
+
+  - name: "Get Approved Communities"
+    flow:
+      - get:
+          url: "/api/communities/approved"
+
+  - name: "Get Projects"
+    flow:
+      - get:
+          url: "/api/projects"
+
+  - name: "Get Funding Sources"
+    flow:
+      - get:
+          url: "/api/funding-sources"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
+
+  - name: "Get Finance Project Summary"
+    flow:
+      - get:
+          url: "/api/funding-records/summary/69a089bd195b9cfe17a86dee"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
+
+  - name: "Get Member Payments By Project"
+    flow:
+      - get:
+          url: "/api/member-payments/project/69a089bd195b9cfe17a86dee"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
+
+  - name: "Get Maintenance Expenses By Project"
+    flow:
+      - get:
+          url: "/api/maintenance-expenses/project/69a089bd195b9cfe17a86dee"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
+
+  - name: "Get Funding Records By Project"
+    flow:
+      - get:
+          url: "/api/funding-records/project/69a089bd195b9cfe17a86dee"
+          headers:
+            Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGIxNzNmYTYwYTYxZmQ1OWRlYzNjNSIsImlhdCI6MTc3NTk2NjAyNCwiZXhwIjoxNzc2NTcwODI0fQ.N1oTMcYJ1vhInQpMdmT0n4upnBsnWIN_BQq8xBnz8Qg"
