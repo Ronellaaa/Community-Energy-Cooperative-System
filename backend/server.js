@@ -93,12 +93,12 @@ app.use("/api/member-payments", memberPaymentRoutes);
 app.use("/api/maintenance-expenses", maintenanceExpenseRoutes);
 app.use("/api/funding-sources", fundingSourceRoutes);
 
-//credit and bill routes
+//payment-slip, qr, meter-reading routes
 app.use("/api/credit", creditRoutes);
-app.use("/api/bills", billRoutes); // Add bill routes
-app.use("/api/payment-slips", paymentSlipRoutes); // Admin payment slip routes
-app.use("/api/member-payment-slips", memberPaymentSlipRoutes); // Member payment slip routes
-app.use("/api/admin", adminBillRoutes); // Admin routes
+app.use("/api/bills", billRoutes); 
+app.use("/api/payment-slips", paymentSlipRoutes);
+app.use("/api/member-payment-slips", memberPaymentSlipRoutes); 
+app.use("/api/admin", adminBillRoutes); 
 app.use("/api/qr", qrRoutes);
 app.use("/api", meterReadingRoutes);
 

@@ -1,0 +1,161 @@
+config:
+  target: "http://localhost:5001"
+  
+  phases:
+    - duration: 15
+      arrivalRate: 2
+      rampTo: 5
+      name: "Warm up phase"
+    
+    - duration: 45
+      arrivalRate: 10
+      name: "Normal load phase"
+    
+    - duration: 20
+      arrivalRate: 20
+      name: "Spike test phase"
+  
+  variables:
+    memberId: "69daa94cf5fa794ee36dd1fc"
+    communityId: "69a6ab55e7fc16364c40772f"
+    readingId: "69db769269f38886f9089ef8"
+    paymentSlipId: "69d61be4cef95333ebb329ae"
+    billId: "69c0060294573e29d6e62b5a"
+    memberToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGFhYTgyZjVmYTc5NGVlMzZkZDI2YyIsImlhdCI6MTc3NTk5MjI5MCwiZXhwIjoxNzc2NTk3MDkwfQ.yV7Jh66Aqtfy1c0SKaG0g1oVLr4gENJz9nlLdkYvKnA"
+    adminToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDRjOTZkYmY1N2Y4NjhjOTE5NTJlYyIsImlhdCI6MTc3NTk5MjIyMywiZXhwIjoxNzc2NTk3MDIzfQ.hVClFS2qLJaP9KYfha34l3BYQzWWDwK9BEC8L4F0ExI"
+  
+  defaults:
+    headers:
+      Content-Type: "application/json"
+  
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+
+scenarios:
+  
+  - name: "Get Member Consumption History"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/readings/member/{{ memberId }}/community/{{ communityId }}"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Single Reading Details"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/readings/{{ readingId }}"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Previous Meter Reading"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/readings/previous/{{ memberId }}/{{ communityId }}/3/2024"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Member Payment Slips List"
+    weight: 8
+    flow:
+      - get:
+          url: "/api/member-payment-slips"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Single Payment Slip Details"
+    weight: 4
+    flow:
+      - get:
+          url: "/api/member-payment-slips/{{ paymentSlipId }}"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Generate/Get Member QR Code"
+    weight: 6
+    flow:
+      - get:
+          url: "/api/qr/{{ memberId }}/{{ communityId }}"
+          headers:
+            Authorization: "Bearer {{ memberToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Admin - Get All Payment Slips"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/payment-slips"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Admin - Get Single Payment Slip"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/payment-slips/{{ paymentSlipId }}"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Admin - Get Payment Slips by Status (Pending)"
+    weight: 3
+    flow:
+      - get:
+          url: "/api/payment-slips?status=pending"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Admin - Get Community Bills"
+    weight: 4
+    flow:
+      - get:
+          url: "/api/admin/community-bills"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Manager - Submit New Meter Reading"
+    weight: 2
+    flow:
+      - post:
+          url: "/api/readings"
+          headers:
+            Authorization: "Bearer {{ adminToken }}"
+          json:
+            memberId: "{{ memberId }}"
+            communityId: "{{ communityId }}"
+            month: "{{ $randomInt(1, 12) }}"
+            year: 2024
+            previousReading: "{{ $randomInt(1000, 2000) }}"
+            currentReading: "{{ $randomInt(1200, 2200) }}"
+          expect:
+            - statusCode: 200
+            - statusCode: 201
+
+  - name: "Health Check"
+    weight: 1
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
