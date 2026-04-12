@@ -43,16 +43,33 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 
+const allowedOrigins = new Set([
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:5176",
+  "https://frontend-onellas-projects.vercel.app",
+  "https://frontend-cqzj2x87r-onellas-projects.vercel.app",
+  "https://frontend-5q3y9jh98-onellas-projects.vercel.app",
+  "https://frontend-fr3q17l0x-onellas-projects.vercel.app",
+]);
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-      "http://localhost:5176", // 
-    ],
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const isAllowedPreview =
+        /^https:\/\/frontend-[a-z0-9-]+-onellas-projects\.vercel\.app$/.test(origin);
+
+      if (allowedOrigins.has(origin) || isAllowedPreview) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
